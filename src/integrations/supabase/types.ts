@@ -288,7 +288,7 @@ export type Database = {
           is_active?: boolean
           last_login?: string | null
           national_id?: string | null
-          password_hash: string
+          password_hash?: string
           phone?: string | null
           postal_code?: string | null
           state?: string | null
