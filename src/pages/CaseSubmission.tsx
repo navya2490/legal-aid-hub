@@ -45,9 +45,33 @@ const CaseSubmission: React.FC = () => {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
+
+  const hasDirtyData = () => {
+    return (
+      personalInfoForm.formState.isDirty ||
+      issueDetailsForm.formState.isDirty ||
+      questionsUrgencyForm.formState.isDirty ||
+      files.length > 0
+    );
+  };
+
+  const handleLeaveAttempt = () => {
+    if (hasDirtyData()) {
+      saveDraft();
+      setShowLeaveDialog(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const confirmLeave = () => {
+    setShowLeaveDialog(false);
+    navigate(-1);
+  };
 
   const personalInfoForm = useForm<PersonalInfoData>({
     resolver: zodResolver(personalInfoSchema),
