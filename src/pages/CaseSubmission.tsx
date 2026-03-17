@@ -281,7 +281,7 @@ const CaseSubmission: React.FC = () => {
         </div>
 
         <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={handleBack} disabled={currentStep === 1 || isSubmitting}>
+          <Button variant="outline" onClick={handleBack} disabled={currentStep === 1}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
 
