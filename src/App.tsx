@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import CaseSubmission from "./pages/CaseSubmission";
+import CaseSubmitted from "./pages/CaseSubmitted";
 import ClientDashboard from "./pages/dashboard/ClientDashboard";
 import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";

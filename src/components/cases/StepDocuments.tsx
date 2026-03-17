@@ -45,19 +45,6 @@ const StepDocuments: React.FC<Props> = ({ files, onFilesChange }) => {
     const id = crypto.randomUUID();
     const storagePath = `${user.id}/${id}-${file.name}`;
 
-    const uploadedFile: UploadedFile = {
-      id,
-      file,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      progress: 0,
-      scanStatus: "Pending",
-    };
-
-    // Add file immediately with 0 progress
-    onFilesChange([...files, uploadedFile]);
-
     const { error } = await supabase.storage
       .from("case-documents")
       .upload(storagePath, file);
@@ -67,15 +54,17 @@ const StepDocuments: React.FC<Props> = ({ files, onFilesChange }) => {
       return null;
     }
 
-    const completedFile: UploadedFile = {
-      ...uploadedFile,
+    return {
+      id,
+      file,
+      name: file.name,
+      size: file.size,
+      type: file.type,
       progress: 100,
       storagePath,
-      scanStatus: "Clean", // Simulated - would be async in production
+      scanStatus: "Clean",
     };
-
-    return completedFile;
-  }, [user, files, onFilesChange]);
+  }, [user]);
 
   const handleFiles = useCallback(async (newFiles: FileList | File[]) => {
     const fileArray = Array.from(newFiles);
