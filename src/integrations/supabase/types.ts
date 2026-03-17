@@ -14,16 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      case_routing_log: {
+        Row: {
+          action: string
+          admin_id: string | null
+          case_id: string
+          created_at: string
+          id: string
+          lawyer_id: string | null
+          reason: string | null
+          score: number | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          case_id: string
+          created_at?: string
+          id?: string
+          lawyer_id?: string | null
+          reason?: string | null
+          score?: number | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          case_id?: string
+          created_at?: string
+          id?: string
+          lawyer_id?: string | null
+          reason?: string | null
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_routing_log_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "case_routing_log_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_routing_log_lawyer_id_fkey"
+            columns: ["lawyer_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_profiles"
+            referencedColumns: ["lawyer_id"]
+          },
+        ]
+      }
       cases: {
         Row: {
           assigned_at: string | null
           assigned_lawyer_id: string | null
           case_id: string
           case_reference_number: string
+          decline_count: number | null
+          declined_lawyer_ids: string[] | null
           issue_category: Database["public"]["Enums"]["specialization"]
           issue_description: string
           privacy_accepted: boolean
           resolved_at: string | null
+          routing_attempts: number | null
           specific_questions: string
           status: Database["public"]["Enums"]["case_status"]
           submitted_at: string
@@ -37,10 +95,13 @@ export type Database = {
           assigned_lawyer_id?: string | null
           case_id?: string
           case_reference_number: string
+          decline_count?: number | null
+          declined_lawyer_ids?: string[] | null
           issue_category: Database["public"]["Enums"]["specialization"]
           issue_description: string
           privacy_accepted?: boolean
           resolved_at?: string | null
+          routing_attempts?: number | null
           specific_questions: string
           status?: Database["public"]["Enums"]["case_status"]
           submitted_at?: string
@@ -54,10 +115,13 @@ export type Database = {
           assigned_lawyer_id?: string | null
           case_id?: string
           case_reference_number?: string
+          decline_count?: number | null
+          declined_lawyer_ids?: string[] | null
           issue_category?: Database["public"]["Enums"]["specialization"]
           issue_description?: string
           privacy_accepted?: boolean
           resolved_at?: string | null
+          routing_attempts?: number | null
           specific_questions?: string
           status?: Database["public"]["Enums"]["case_status"]
           submitted_at?: string

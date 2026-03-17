@@ -1,1 +1,4 @@
 project_id = "pkkmbpiyimflbjyibtjz"
+
+[functions.case-routing]
+verify_jwt = false
