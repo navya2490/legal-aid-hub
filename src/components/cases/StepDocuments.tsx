@@ -85,6 +85,7 @@ const StepDocuments: React.FC<Props> = ({ files, onFilesChange }) => {
       return;
     }
 
+    const uploadedResults: UploadedFile[] = [];
     for (const file of fileArray) {
       if (file.size > MAX_FILE_SIZE) {
         toast.error(`${file.name} exceeds 10MB limit`);
@@ -97,12 +98,13 @@ const StepDocuments: React.FC<Props> = ({ files, onFilesChange }) => {
 
       const uploaded = await uploadFile(file);
       if (uploaded) {
-        onFilesChange((prev: UploadedFile[]) => 
-          prev.map((f: UploadedFile) => f.id === uploaded.id ? uploaded : f)
-        );
+        uploadedResults.push(uploaded);
       }
     }
-  }, [files.length, uploadFile, onFilesChange]);
+    if (uploadedResults.length > 0) {
+      onFilesChange([...files, ...uploadedResults]);
+    }
+  }, [files, uploadFile, onFilesChange]);
 
   const removeFile = useCallback(async (fileId: string) => {
     const file = files.find((f) => f.id === fileId);
