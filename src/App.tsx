@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import CaseSubmission from "./pages/CaseSubmission";
+import CaseSubmitted from "./pages/CaseSubmitted";
 import ClientDashboard from "./pages/dashboard/ClientDashboard";
 import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
@@ -30,6 +32,22 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route
+              path="/submit-case"
+              element={
+                <ProtectedRoute allowedRoles={["client"]}>
+                  <CaseSubmission />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/case-submitted"
+              element={
+                <ProtectedRoute allowedRoles={["client"]}>
+                  <CaseSubmitted />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/dashboard/client"
               element={

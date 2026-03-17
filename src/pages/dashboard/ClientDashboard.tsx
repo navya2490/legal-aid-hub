@@ -1,7 +1,8 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Scale, FileText, MessageSquare, LogOut, User } from "lucide-react";
+import { Scale, FileText, MessageSquare, LogOut, User, Plus } from "lucide-react";
 
 const ClientDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -28,7 +29,14 @@ const ClientDashboard: React.FC = () => {
       </header>
       <main className="container mx-auto px-6 py-10">
         <h1 className="text-3xl font-bold text-foreground mb-2">Client Dashboard</h1>
-        <p className="text-muted-foreground mb-8">Welcome back! Manage your legal cases and consultations.</p>
+        <div className="flex items-center justify-between mb-8">
+          <p className="text-muted-foreground">Welcome back! Manage your legal cases and consultations.</p>
+          <Button asChild>
+            <Link to="/submit-case">
+              <Plus className="h-4 w-4 mr-1" /> Submit a Case
+            </Link>
+          </Button>
+        </div>
         <div className="grid gap-6 md:grid-cols-3">
           <div className="rounded-xl border border-border bg-card p-6 space-y-3">
             <FileText className="h-8 w-8 text-primary" />
