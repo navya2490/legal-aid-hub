@@ -5,6 +5,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Save, Loader2, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import StepProgressIndicator from "@/components/cases/StepProgressIndicator";
 import StepPersonalInfo from "@/components/cases/StepPersonalInfo";
@@ -35,9 +45,33 @@ const CaseSubmission: React.FC = () => {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
+
+  const hasDirtyData = () => {
+    return (
+      personalInfoForm.formState.isDirty ||
+      issueDetailsForm.formState.isDirty ||
+      questionsUrgencyForm.formState.isDirty ||
+      files.length > 0
+    );
+  };
+
+  const handleLeaveAttempt = () => {
+    if (hasDirtyData()) {
+      saveDraft();
+      setShowLeaveDialog(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const confirmLeave = () => {
+    setShowLeaveDialog(false);
+    navigate(-1);
+  };
 
   const personalInfoForm = useForm<PersonalInfoData>({
     resolver: zodResolver(personalInfoSchema),
@@ -281,7 +315,7 @@ const CaseSubmission: React.FC = () => {
         </div>
 
         <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={currentStep === 1 ? () => navigate(-1) : handleBack}>
+          <Button variant="outline" onClick={currentStep === 1 ? handleLeaveAttempt : handleBack}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
 
@@ -307,6 +341,21 @@ const CaseSubmission: React.FC = () => {
           )}
         </div>
       </main>
+
+      <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave case submission?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your progress has been saved as a draft. You can resume where you left off when you return.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continue Editing</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLeave}>Leave Page</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
