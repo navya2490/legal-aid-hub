@@ -105,16 +105,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error) {
-      // Update last_login
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
-          .from("users")
-          .update({ last_login: new Date().toISOString() })
-          .eq("user_id", user.id);
-      }
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!error && data.user) {
+      // Update last_login in background — don't block the login flow
+      supabase
+        .from("users")
+        .update({ last_login: new Date().toISOString() })
+        .eq("user_id", data.user.id)
+        .then();
     }
     return { error: error ? new Error(error.message) : null };
   };
