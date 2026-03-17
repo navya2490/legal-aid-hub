@@ -33,6 +33,22 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
+              path="/submit-case"
+              element={
+                <ProtectedRoute allowedRoles={["client"]}>
+                  <CaseSubmission />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/case-submitted"
+              element={
+                <ProtectedRoute allowedRoles={["client"]}>
+                  <CaseSubmitted />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/dashboard/client"
               element={
                 <ProtectedRoute allowedRoles={["client"]}>
