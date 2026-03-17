@@ -1,7 +1,8 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Scale, FileText, MessageSquare, LogOut, User } from "lucide-react";
+import { Scale, FileText, MessageSquare, LogOut, User, Plus } from "lucide-react";
 
 const ClientDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
