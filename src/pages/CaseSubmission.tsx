@@ -315,7 +315,7 @@ const CaseSubmission: React.FC = () => {
         </div>
 
         <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={currentStep === 1 ? () => navigate(-1) : handleBack}>
+          <Button variant="outline" onClick={currentStep === 1 ? handleLeaveAttempt : handleBack}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
 
@@ -341,6 +341,21 @@ const CaseSubmission: React.FC = () => {
           )}
         </div>
       </main>
+
+      <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave case submission?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your progress has been saved as a draft. You can resume where you left off when you return.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continue Editing</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLeave}>Leave Page</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
