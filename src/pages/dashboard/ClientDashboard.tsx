@@ -1,59 +1,116 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Scale, FileText, MessageSquare, LogOut, User, Plus } from "lucide-react";
+import { Plus, FileText } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import ClientHeader from "@/components/dashboard/ClientHeader";
+import DashboardStats from "@/components/dashboard/DashboardStats";
+import CaseFilters from "@/components/dashboard/CaseFilters";
+import CaseCard from "@/components/dashboard/CaseCard";
+import { useClientCases } from "@/hooks/useClientCases";
 
 const ClientDashboard: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { data: cases = [], isLoading, error } = useClientCases();
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+
+  const filteredCases = useMemo(() => {
+    let result = [...cases];
+
+    if (statusFilter !== "all") {
+      result = result.filter((c) => c.status === statusFilter);
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (c) =>
+          c.case_reference_number.toLowerCase().includes(q) ||
+          c.issue_category.toLowerCase().includes(q)
+      );
+    }
+
+    result.sort((a, b) => {
+      if (sortBy === "newest") return new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime();
+      if (sortBy === "oldest") return new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime();
+      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+    });
+
+    return result;
+  }, [cases, statusFilter, searchQuery, sortBy]);
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <Scale className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold text-foreground">LegalConnect</span>
+      <ClientHeader />
+      <main className="container mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">My Cases</h1>
+            <p className="text-sm text-muted-foreground mt-1">Manage your legal cases and track progress.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{user?.email}</span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </header>
-      <main className="container mx-auto px-6 py-10">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Client Dashboard</h1>
-        <div className="flex items-center justify-between mb-8">
-          <p className="text-muted-foreground">Welcome back! Manage your legal cases and consultations.</p>
           <Button asChild>
             <Link to="/submit-case">
-              <Plus className="h-4 w-4 mr-1" /> Submit a Case
+              <Plus className="h-4 w-4 mr-1.5" /> Submit New Case
             </Link>
           </Button>
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-xl border border-border bg-card p-6 space-y-3">
-            <FileText className="h-8 w-8 text-primary" />
-            <h3 className="text-lg font-semibold text-card-foreground">My Cases</h3>
-            <p className="text-sm text-muted-foreground">View and manage your submitted legal cases.</p>
+
+        {/* Stats */}
+        {!isLoading && <DashboardStats cases={cases} />}
+
+        {/* Filters */}
+        <CaseFilters
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+
+        {/* Cases list */}
+        {isLoading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-[160px] rounded-xl" />
+            ))}
           </div>
-          <div className="rounded-xl border border-border bg-card p-6 space-y-3">
-            <MessageSquare className="h-8 w-8 text-primary" />
-            <h3 className="text-lg font-semibold text-card-foreground">Messages</h3>
-            <p className="text-sm text-muted-foreground">Communicate with your assigned lawyer.</p>
+        ) : error ? (
+          <div className="text-center py-16">
+            <p className="text-destructive">Failed to load cases. Please try again.</p>
           </div>
-          <div className="rounded-xl border border-border bg-card p-6 space-y-3">
-            <User className="h-8 w-8 text-primary" />
-            <h3 className="text-lg font-semibold text-card-foreground">Profile</h3>
-            <p className="text-sm text-muted-foreground">Update your personal information.</p>
+        ) : filteredCases.length === 0 ? (
+          <div className="text-center py-16 space-y-4">
+            <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+              <FileText className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">
+                {cases.length === 0 ? "No cases yet" : "No matching cases"}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {cases.length === 0
+                  ? "Submit your first case to get started with legal assistance."
+                  : "Try adjusting your filters or search query."}
+              </p>
+            </div>
+            {cases.length === 0 && (
+              <Button asChild>
+                <Link to="/submit-case">
+                  <Plus className="h-4 w-4 mr-1.5" /> Submit a Case
+                </Link>
+              </Button>
+            )}
           </div>
-        </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredCases.map((c) => (
+              <CaseCard key={c.case_id} caseData={c} />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
