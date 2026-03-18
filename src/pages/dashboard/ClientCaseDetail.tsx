@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Download, FileText, MessageSquare, Clock, User } from "lucide-react";
+import { ArrowLeft, Download, FileText, Clock } from "lucide-react";
 import { format } from "date-fns";
 import ClientHeader from "@/components/dashboard/ClientHeader";
 import CaseStatusBadge from "@/components/dashboard/CaseStatusBadge";
+import CaseMessageThread from "@/components/messaging/CaseMessageThread";
 import type { Database } from "@/integrations/supabase/types";
 
 type CaseStatus = Database["public"]["Enums"]["case_status"];
