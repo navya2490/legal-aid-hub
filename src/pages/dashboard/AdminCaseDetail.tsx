@@ -466,11 +466,6 @@ const AdminCaseDetail: React.FC = () => {
             case_id: caseData.case_id,
             case_reference_number: caseData.case_reference_number,
             issue_category: caseData.issue_category,
-            urgency_level: caseData.urgency_level,
-            status: caseData.status,
-            submitted_at: caseData.submitted_at,
-            assigned_lawyer_id: caseData.assigned_lawyer_id,
-            decline_count: caseData.decline_count ?? 0,
           }}
           adminId={user?.id || ""}
           onClose={() => setShowAssign(false)}
