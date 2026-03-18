@@ -116,7 +116,7 @@ const LawyerDashboard: React.FC = () => {
     setLoadingMessages(true);
     const { data } = await supabase
       .from("messages")
-      .select("message_id, message_text, sender_id, sent_at, is_read")
+      .select("message_id, message_text, sender_id, recipient_id, sent_at, is_read")
       .eq("case_id", caseId)
       .order("sent_at", { ascending: true });
     setMessages((data || []) as Message[]);
