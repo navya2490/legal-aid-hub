@@ -1,12 +1,19 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
 type AppRole = "client" | "lawyer" | "admin";
+type AuthUser = {
+  id: string;
+  email?: string | null;
+  user_metadata?: Record<string, unknown>;
+};
+type AuthSession = {
+  user: AuthUser | null;
+} | null;
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
+  session: AuthSession;
   role: AppRole | null;
   loading: boolean;
   signUp: (email: string, password: string, fullName: string, role: "client" | "lawyer") => Promise<{ error: Error | null }>;
@@ -34,8 +41,9 @@ const parseRoleFromMetadata = (metadataRole: unknown): AppRole | null => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const auth = supabase.auth as any;
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<AuthSession>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return pickRole(roles);
   }, []);
 
-  const hydrateAuthState = useCallback(async (nextSession: Session | null) => {
+  const hydrateAuthState = useCallback(async (nextSession: AuthSession) => {
     setSession(nextSession);
     setUser(nextSession?.user ?? null);
 
@@ -85,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const resetTimer = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        supabase.auth.signOut();
+        auth.signOut();
       }, SESSION_TIMEOUT_MS);
     };
 
@@ -97,26 +105,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearTimeout(timeoutId);
       events.forEach((e) => window.removeEventListener(e, resetTimer));
     };
-  }, [session]);
+  }, [session, auth]);
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, nextSession) => {
+    const { data: { subscription } } = auth.onAuthStateChange(
+      async (_event: string, nextSession: AuthSession) => {
         await hydrateAuthState(nextSession);
       }
     );
 
     // THEN get initial session
-    supabase.auth.getSession().then(async ({ data: { session: initialSession } }) => {
+    auth.getSession().then(async ({ data: { session: initialSession } }: { data: { session: AuthSession } }) => {
       await hydrateAuthState(initialSession);
     });
 
     return () => subscription.unsubscribe();
-  }, [hydrateAuthState]);
+  }, [hydrateAuthState, auth]);
 
   const signUp = async (email: string, password: string, fullName: string, role: "client" | "lawyer") => {
-    const { error } = await supabase.auth.signUp({
+    const { error } = await auth.signUp({
       email: email.trim().toLowerCase(),
       password,
       options: {
@@ -129,19 +137,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     const normalizedEmail = email.trim().toLowerCase();
-    const { data, error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+    const { data, error } = await auth.signInWithPassword({ email: normalizedEmail, password });
 
     if (error) {
       console.error("Login error:", error.message);
       return { error: new Error(error.message) };
     }
 
-    if (data.user) {
-      setUser(data.user);
-      setSession(data.session ?? null);
+    if (data?.user) {
+      setUser(data.user as AuthUser);
+      setSession((data.session ?? null) as AuthSession);
 
       const dbRole = await fetchRole(data.user.id);
-      const metadataRole = parseRoleFromMetadata(data.user.user_metadata?.role);
+      const metadataRole = parseRoleFromMetadata((data.user.user_metadata as Record<string, unknown> | undefined)?.role);
       setRole(dbRole ?? metadataRole);
 
       console.info("Login successful", { userId: data.user.id, email: data.user.email });
@@ -162,21 +170,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await auth.signOut();
     setUser(null);
     setSession(null);
     setRole(null);
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     return { error: error ? new Error(error.message) : null };
   };
 
   const updatePassword = async (password: string) => {
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await auth.updateUser({ password });
     return { error: error ? new Error(error.message) : null };
   };
 

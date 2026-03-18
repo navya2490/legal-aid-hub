@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/case-routing`;
 
 async function callRouting(body: Record<string, unknown>) {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await (supabase.auth as { getSession: () => Promise<{ data: { session: { access_token?: string } | null } }> }).getSession();
   const token = session?.access_token;
 
   const response = await fetch(FUNCTION_URL, {
