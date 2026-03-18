@@ -7,15 +7,14 @@ import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Scale, Briefcase, LogOut, XCircle, Loader2, RefreshCw,
-  CheckCircle2, MessageSquare, Send, Clock, AlertTriangle,
-  Activity, Shield
+  CheckCircle2, Clock, AlertTriangle, Shield
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lawyerDeclineCase } from "@/lib/caseRouting";
 import { toast } from "sonner";
+import CaseMessageThread from "@/components/messaging/CaseMessageThread";
 import type { Database } from "@/integrations/supabase/types";
 
 type CaseStatus = Database["public"]["Enums"]["case_status"];
