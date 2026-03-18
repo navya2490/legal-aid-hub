@@ -67,35 +67,21 @@ const ClientCaseDetail: React.FC = () => {
     },
   });
 
-  const { data: messages = [] } = useQuery({
-    queryKey: ["case-messages", caseId],
-    enabled: !!caseId && !!user,
+  // Get the lawyer's user_id for messaging
+  const lawyerUserId = caseData?.assigned_lawyer_id
+    ? undefined // we'll compute it below
+    : null;
+
+  const { data: lawyerUser } = useQuery({
+    queryKey: ["lawyer-user", caseData?.assigned_lawyer_id],
+    enabled: !!caseData?.assigned_lawyer_id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("case_id", caseId!)
-        .order("sent_at", { ascending: true });
-      if (error) throw error;
-
-      // Fetch sender names
-      const senderIds = [...new Set(data?.map((m) => m.sender_id) || [])];
-      let nameMap: Record<string, string> = {};
-      if (senderIds.length > 0) {
-        const { data: users } = await supabase
-          .from("users")
-          .select("user_id, full_name")
-          .in("user_id", senderIds);
-        if (users) {
-          nameMap = Object.fromEntries(users.map((u) => [u.user_id, u.full_name]));
-        }
-      }
-
-      return (data || []).map((m) => ({
-        ...m,
-        sender_name: nameMap[m.sender_id] || "Unknown",
-        is_own: m.sender_id === user!.id,
-      }));
+      const { data } = await supabase
+        .from("lawyer_profiles")
+        .select("user_id")
+        .eq("lawyer_id", caseData!.assigned_lawyer_id!)
+        .single();
+      return data;
     },
   });
 
