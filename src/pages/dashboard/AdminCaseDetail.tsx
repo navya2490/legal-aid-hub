@@ -428,7 +428,7 @@ const AdminCaseDetail: React.FC = () => {
                               <div className={`h-2 w-2 rounded-full ${
                                 log.action === "declined" || log.action === "escalated"
                                   ? "bg-destructive"
-                                  : "bg-muted-foreground"
+                                  : "bg-muted-foreground/50"
                               }`} />
                             </div>
                             <div className="flex-1 min-w-0">
