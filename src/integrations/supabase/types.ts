@@ -241,6 +241,10 @@ export type Database = {
       }
       messages: {
         Row: {
+          attachment_name: string | null
+          attachment_path: string | null
+          attachment_size: number | null
+          attachment_type: string | null
           case_id: string
           is_read: boolean
           message_id: string
@@ -251,6 +255,10 @@ export type Database = {
           sent_at: string
         }
         Insert: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
           case_id: string
           is_read?: boolean
           message_id?: string
@@ -261,6 +269,10 @@ export type Database = {
           sent_at?: string
         }
         Update: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
           case_id?: string
           is_read?: boolean
           message_id?: string
