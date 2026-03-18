@@ -183,29 +183,8 @@ const LawyerDashboard: React.FC = () => {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedCaseId || !user) return;
-    const selectedCase = cases.find(c => c.case_id === selectedCaseId);
-    if (!selectedCase) return;
 
-    setSendingMessage(true);
-    try {
-      const { error } = await supabase.from("messages").insert({
-        case_id: selectedCaseId,
-        sender_id: user.id,
-        recipient_id: selectedCase.user_id,
-        message_text: newMessage.trim(),
-      });
-      if (error) throw error;
-      setNewMessage("");
-      loadMessages(selectedCaseId);
-      toast.success("Message sent");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send message");
-    } finally {
-      setSendingMessage(false);
-    }
-  };
+
 
   const newAssignments = cases.filter(c => c.status === "Assigned");
   const activeCases = cases.filter(c => ["In Progress", "Awaiting Client"].includes(c.status));
