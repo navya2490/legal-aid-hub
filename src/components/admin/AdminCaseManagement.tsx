@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Gavel, Search, Loader2 } from "lucide-react";
+import { Gavel, Search, Loader2, Eye } from "lucide-react";
 import { Constants } from "@/integrations/supabase/types";
 import AdminCaseAssignDialog from "./AdminCaseAssignDialog";
 import RoutingLogDialog from "./RoutingLogDialog";
@@ -45,6 +46,7 @@ const statusVariant: Record<string, string> = {
 };
 
 const AdminCaseManagement: React.FC<Props> = ({ cases, loading, adminId, onRefresh }) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [urgencyFilter, setUrgencyFilter] = useState("all");
@@ -144,6 +146,9 @@ const AdminCaseManagement: React.FC<Props> = ({ cases, loading, adminId, onRefre
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-1 justify-end">
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/dashboard/admin/case/${c.case_id}`)}>
+                        <Eye className="h-3 w-3 mr-1" /> View
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => setLogCaseId(c.case_id)}>Log</Button>
                       <Button variant="outline" size="sm" onClick={() => setAssignCase(c)}>
                         <Gavel className="h-3 w-3 mr-1" /> Assign
