@@ -60,10 +60,6 @@ const LawyerDashboard: React.FC = () => {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [togglingAvailability, setTogglingAvailability] = useState(false);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [sendingMessage, setSendingMessage] = useState(false);
-  const [loadingMessages, setLoadingMessages] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
