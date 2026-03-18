@@ -146,6 +146,9 @@ const AdminCaseManagement: React.FC<Props> = ({ cases, loading, adminId, onRefre
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-1 justify-end">
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/dashboard/admin/case/${c.case_id}`)}>
+                        <Eye className="h-3 w-3 mr-1" /> View
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => setLogCaseId(c.case_id)}>Log</Button>
                       <Button variant="outline" size="sm" onClick={() => setAssignCase(c)}>
                         <Gavel className="h-3 w-3 mr-1" /> Assign
