@@ -7,15 +7,14 @@ import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Scale, Briefcase, LogOut, XCircle, Loader2, RefreshCw,
-  CheckCircle2, MessageSquare, Send, Clock, AlertTriangle,
-  Activity, Shield
+  CheckCircle2, Clock, AlertTriangle, Shield
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lawyerDeclineCase } from "@/lib/caseRouting";
 import { toast } from "sonner";
+import CaseMessageThread from "@/components/messaging/CaseMessageThread";
 import type { Database } from "@/integrations/supabase/types";
 
 type CaseStatus = Database["public"]["Enums"]["case_status"];
@@ -42,13 +41,6 @@ interface AssignedCase {
   client_name?: string;
 }
 
-interface Message {
-  message_id: string;
-  message_text: string;
-  sender_id: string;
-  sent_at: string;
-  is_read: boolean;
-}
 
 const urgencyConfig: Record<string, { class: string; icon: typeof AlertTriangle | null }> = {
   Low: { class: "bg-emerald-100 text-emerald-700 border-emerald-200", icon: null },
@@ -68,10 +60,6 @@ const LawyerDashboard: React.FC = () => {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [togglingAvailability, setTogglingAvailability] = useState(false);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [sendingMessage, setSendingMessage] = useState(false);
-  const [loadingMessages, setLoadingMessages] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -128,46 +116,6 @@ const LawyerDashboard: React.FC = () => {
     return () => { supabase.removeChannel(caseChannel); };
   }, [profile?.lawyer_id, fetchData]);
 
-  const loadMessages = useCallback(async (caseId: string) => {
-    setLoadingMessages(true);
-    const { data } = await supabase
-      .from("messages")
-      .select("message_id, message_text, sender_id, recipient_id, sent_at, is_read")
-      .eq("case_id", caseId)
-      .order("sent_at", { ascending: true });
-    setMessages((data || []) as Message[]);
-    setLoadingMessages(false);
-
-    if (data && user) {
-      const unread = data.filter(m => m.recipient_id === user.id && !m.is_read);
-      if (unread.length > 0) {
-        await supabase
-          .from("messages")
-          .update({ is_read: true, read_at: new Date().toISOString() })
-          .in("message_id", unread.map(m => m.message_id));
-      }
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (selectedCaseId) loadMessages(selectedCaseId);
-  }, [selectedCaseId, loadMessages]);
-
-  // Realtime: messages for the selected case
-  useEffect(() => {
-    if (!selectedCaseId) return;
-
-    const msgChannel = supabase
-      .channel(`case-messages-${selectedCaseId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages", filter: `case_id=eq.${selectedCaseId}` },
-        () => { loadMessages(selectedCaseId); }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(msgChannel); };
-  }, [selectedCaseId, loadMessages]);
 
   const handleDecline = async (caseId: string) => {
     if (!profile) return;
@@ -235,29 +183,8 @@ const LawyerDashboard: React.FC = () => {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedCaseId || !user) return;
-    const selectedCase = cases.find(c => c.case_id === selectedCaseId);
-    if (!selectedCase) return;
 
-    setSendingMessage(true);
-    try {
-      const { error } = await supabase.from("messages").insert({
-        case_id: selectedCaseId,
-        sender_id: user.id,
-        recipient_id: selectedCase.user_id,
-        message_text: newMessage.trim(),
-      });
-      if (error) throw error;
-      setNewMessage("");
-      loadMessages(selectedCaseId);
-      toast.success("Message sent");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send message");
-    } finally {
-      setSendingMessage(false);
-    }
-  };
+
 
   const newAssignments = cases.filter(c => c.status === "Assigned");
   const activeCases = cases.filter(c => ["In Progress", "Awaiting Client"].includes(c.status));
@@ -501,73 +428,20 @@ const LawyerDashboard: React.FC = () => {
               </Card>
 
               {/* Messages Panel */}
-              <Card className="flex flex-col" style={{ minHeight: "360px" }}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    {selectedCase ? `Chat — ${selectedCase.case_reference_number}` : "Select a case to chat"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
-                  {!selectedCaseId ? (
-                    <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-                      <p>Click a case to view messages</p>
-                    </div>
-                  ) : loadingMessages ? (
-                    <div className="flex-1 flex items-center justify-center">
-                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex-1 overflow-y-auto space-y-2 mb-3 max-h-[240px] pr-1">
-                        {messages.length === 0 ? (
-                          <p className="text-xs text-muted-foreground text-center py-4">No messages yet.</p>
-                        ) : (
-                          messages.map(m => {
-                            const isMe = m.sender_id === user?.id;
-                            return (
-                              <div key={m.message_id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                                <div className={`max-w-[80%] rounded-lg px-3 py-2 text-xs ${
-                                  isMe
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-muted text-foreground"
-                                }`}>
-                                  <p>{m.message_text}</p>
-                                  <p className={`text-[10px] mt-1 ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                                    {new Date(m.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <Textarea
-                          value={newMessage}
-                          onChange={e => setNewMessage(e.target.value)}
-                          placeholder="Type a message..."
-                          className="text-xs min-h-[36px] h-9 resize-none"
-                          onKeyDown={e => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSendMessage();
-                            }
-                          }}
-                        />
-                        <Button
-                          size="icon"
-                          className="shrink-0 h-9 w-9"
-                          onClick={handleSendMessage}
-                          disabled={sendingMessage || !newMessage.trim()}
-                        >
-                          {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
+              {selectedCaseId && selectedCase ? (
+                <CaseMessageThread
+                  caseId={selectedCaseId}
+                  recipientId={selectedCase.user_id}
+                  recipientName={selectedCase.client_name || "Client"}
+                  caseStatus={selectedCase.status}
+                />
+              ) : (
+                <Card style={{ minHeight: "200px" }}>
+                  <CardContent className="flex items-center justify-center h-full py-16 text-muted-foreground text-sm">
+                    <p>Click a case to view messages</p>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Case Details */}
               {selectedCase && (

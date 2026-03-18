@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Download, FileText, MessageSquare, Clock, User } from "lucide-react";
+import { ArrowLeft, Download, FileText, Clock } from "lucide-react";
 import { format } from "date-fns";
 import ClientHeader from "@/components/dashboard/ClientHeader";
 import CaseStatusBadge from "@/components/dashboard/CaseStatusBadge";
+import CaseMessageThread from "@/components/messaging/CaseMessageThread";
 import type { Database } from "@/integrations/supabase/types";
 
 type CaseStatus = Database["public"]["Enums"]["case_status"];
@@ -66,35 +67,21 @@ const ClientCaseDetail: React.FC = () => {
     },
   });
 
-  const { data: messages = [] } = useQuery({
-    queryKey: ["case-messages", caseId],
-    enabled: !!caseId && !!user,
+  // Get the lawyer's user_id for messaging
+  const lawyerUserId = caseData?.assigned_lawyer_id
+    ? undefined // we'll compute it below
+    : null;
+
+  const { data: lawyerUser } = useQuery({
+    queryKey: ["lawyer-user", caseData?.assigned_lawyer_id],
+    enabled: !!caseData?.assigned_lawyer_id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("case_id", caseId!)
-        .order("sent_at", { ascending: true });
-      if (error) throw error;
-
-      // Fetch sender names
-      const senderIds = [...new Set(data?.map((m) => m.sender_id) || [])];
-      let nameMap: Record<string, string> = {};
-      if (senderIds.length > 0) {
-        const { data: users } = await supabase
-          .from("users")
-          .select("user_id, full_name")
-          .in("user_id", senderIds);
-        if (users) {
-          nameMap = Object.fromEntries(users.map((u) => [u.user_id, u.full_name]));
-        }
-      }
-
-      return (data || []).map((m) => ({
-        ...m,
-        sender_name: nameMap[m.sender_id] || "Unknown",
-        is_own: m.sender_id === user!.id,
-      }));
+      const { data } = await supabase
+        .from("lawyer_profiles")
+        .select("user_id")
+        .eq("lawyer_id", caseData!.assigned_lawyer_id!)
+        .single();
+      return data;
     },
   });
 
@@ -192,36 +179,25 @@ const ClientCaseDetail: React.FC = () => {
             </Card>
 
             {/* Messages */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Messages ({messages.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {messages.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-6">No messages yet.</p>
-                ) : (
-                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                    {messages.map((m) => (
-                      <div
-                        key={m.message_id}
-                        className={`flex flex-col ${m.is_own ? "items-end" : "items-start"}`}
-                      >
-                        <div className={`rounded-lg px-4 py-2.5 max-w-[80%] ${m.is_own ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
-                          <p className="text-xs font-medium mb-1 opacity-75">{m.sender_name}</p>
-                          <p className="text-sm">{m.message_text}</p>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-1">
-                          {format(new Date(m.sent_at), "MMM d, h:mm a")}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            {lawyerUser?.user_id ? (
+              <CaseMessageThread
+                caseId={caseId!}
+                recipientId={lawyerUser.user_id}
+                recipientName={caseData.lawyerName || "Your Lawyer"}
+                caseStatus={caseData.status}
+              />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Messages</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground text-center py-6">
+                    Messaging will be available once a lawyer is assigned to your case.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar - Documents */}
