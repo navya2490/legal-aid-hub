@@ -179,36 +179,25 @@ const ClientCaseDetail: React.FC = () => {
             </Card>
 
             {/* Messages */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Messages ({messages.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {messages.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-6">No messages yet.</p>
-                ) : (
-                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                    {messages.map((m) => (
-                      <div
-                        key={m.message_id}
-                        className={`flex flex-col ${m.is_own ? "items-end" : "items-start"}`}
-                      >
-                        <div className={`rounded-lg px-4 py-2.5 max-w-[80%] ${m.is_own ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
-                          <p className="text-xs font-medium mb-1 opacity-75">{m.sender_name}</p>
-                          <p className="text-sm">{m.message_text}</p>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground mt-1">
-                          {format(new Date(m.sent_at), "MMM d, h:mm a")}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            {lawyerUser?.user_id ? (
+              <CaseMessageThread
+                caseId={caseId!}
+                recipientId={lawyerUser.user_id}
+                recipientName={caseData.lawyerName || "Your Lawyer"}
+                caseStatus={caseData.status}
+              />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Messages</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground text-center py-6">
+                    Messaging will be available once a lawyer is assigned to your case.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar - Documents */}
