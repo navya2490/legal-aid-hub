@@ -43,6 +43,11 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
+    --portal-blue: 211 72% 54%;
+    --portal-blue-foreground: 0 0% 100%;
+    --portal-green: 88 63% 37%;
+    --portal-green-foreground: 0 0% 100%;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
