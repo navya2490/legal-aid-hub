@@ -41,13 +41,6 @@ interface AssignedCase {
   client_name?: string;
 }
 
-interface Message {
-  message_id: string;
-  message_text: string;
-  sender_id: string;
-  sent_at: string;
-  is_read: boolean;
-}
 
 const urgencyConfig: Record<string, { class: string; icon: typeof AlertTriangle | null }> = {
   Low: { class: "bg-emerald-100 text-emerald-700 border-emerald-200", icon: null },
