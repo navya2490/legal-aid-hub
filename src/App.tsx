@@ -58,6 +58,14 @@ const App = () => (
               }
             />
             <Route
+              path="/dashboard/client/case/:caseId"
+              element={
+                <ProtectedRoute allowedRoles={["client"]}>
+                  <ClientCaseDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/dashboard/lawyer"
               element={
                 <ProtectedRoute allowedRoles={["lawyer"]}>
