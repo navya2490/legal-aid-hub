@@ -16,6 +16,7 @@ import CaseSubmitted from "./pages/CaseSubmitted";
 import ClientDashboard from "./pages/dashboard/ClientDashboard";
 import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
+import AdminCaseDetail from "./pages/dashboard/AdminCaseDetail";
 import ClientCaseDetail from "./pages/dashboard/ClientCaseDetail";
 import NotFound from "./pages/NotFound";
 
