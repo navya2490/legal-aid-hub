@@ -43,6 +43,19 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchCases();
+
+    const channel = supabase
+      .channel('admin-cases-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'cases' },
+        () => fetchCases()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const reviewCount = cases.filter((c) => !c.assigned_lawyer_id || c.decline_count >= 3).length;
