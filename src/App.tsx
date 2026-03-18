@@ -15,6 +15,7 @@ import CaseSubmitted from "./pages/CaseSubmitted";
 import ClientDashboard from "./pages/dashboard/ClientDashboard";
 import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
+import ClientCaseDetail from "./pages/dashboard/ClientCaseDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["client"]}>
                   <ClientDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/client/case/:caseId"
+              element={
+                <ProtectedRoute allowedRoles={["client"]}>
+                  <ClientCaseDetail />
                 </ProtectedRoute>
               }
             />
