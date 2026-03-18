@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bunx --bun vite@7.1.12",
-    "build": "bunx --bun vite@7.1.12 build",
-    "build:dev": "bunx --bun vite@7.1.12 build --mode development",
+    "dev": "vite",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "bunx --bun vite@7.1.12 preview",
-    "test": "bunx --bun vitest@4.1.0 run",
-    "test:watch": "bunx --bun vitest@4.1.0"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
