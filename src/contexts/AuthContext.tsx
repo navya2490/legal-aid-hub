@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
 type AppRole = "client" | "lawyer" | "admin";
 
@@ -20,6 +19,19 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+const ROLE_PRIORITY: AppRole[] = ["admin", "lawyer", "client"];
+
+const pickRole = (roles: AppRole[]): AppRole | null => {
+  const prioritized = ROLE_PRIORITY.find((r) => roles.includes(r));
+  return prioritized ?? roles[0] ?? null;
+};
+
+const parseRoleFromMetadata = (metadataRole: unknown): AppRole | null => {
+  if (metadataRole === "client" || metadataRole === "lawyer" || metadataRole === "admin") {
+    return metadataRole;
+  }
+  return null;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -31,12 +43,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
+      .eq("user_id", userId);
 
-    if (error || !data) return null;
-    return data.role as AppRole;
+    if (error) {
+      console.error("Role fetch failed:", error.message);
+      return null;
+    }
+
+    const roles = (data ?? []).map((item) => item.role as AppRole);
+    return pickRole(roles);
   }, []);
+
+  const hydrateAuthState = useCallback(async (nextSession: Session | null) => {
+    setSession(nextSession);
+    setUser(nextSession?.user ?? null);
+
+    if (!nextSession?.user) {
+      setRole(null);
+      setLoading(false);
+      return;
+    }
+
+    const dbRole = await fetchRole(nextSession.user.id);
+    const metadataRole = parseRoleFromMetadata(nextSession.user.user_metadata?.role);
+    const resolvedRole = dbRole ?? metadataRole;
+
+    if (!resolvedRole) {
+      console.warn("Authenticated user has no role mapping.", { userId: nextSession.user.id });
+    }
+
+    setRole(resolvedRole);
+    setLoading(false);
+  }, [fetchRole]);
 
   // Session timeout via activity tracking
   useEffect(() => {
@@ -64,37 +102,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-          const userRole = await fetchRole(session.user.id);
-          setRole(userRole);
-        } else {
-          setRole(null);
-        }
-        setLoading(false);
+      async (_event, nextSession) => {
+        await hydrateAuthState(nextSession);
       }
     );
 
     // THEN get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        const userRole = await fetchRole(session.user.id);
-        setRole(userRole);
-      }
-      setLoading(false);
+    supabase.auth.getSession().then(async ({ data: { session: initialSession } }) => {
+      await hydrateAuthState(initialSession);
     });
 
     return () => subscription.unsubscribe();
-  }, [fetchRole]);
+  }, [hydrateAuthState]);
 
   const signUp = async (email: string, password: string, fullName: string, role: "client" | "lawyer") => {
     const { error } = await supabase.auth.signUp({
-      email,
+      email: email.trim().toLowerCase(),
       password,
       options: {
         data: { full_name: fullName, role },
@@ -105,16 +128,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error && data.user) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const { data, error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+
+    if (error) {
+      console.error("Login error:", error.message);
+      return { error: new Error(error.message) };
+    }
+
+    if (data.user) {
+      setUser(data.user);
+      setSession(data.session ?? null);
+
+      const dbRole = await fetchRole(data.user.id);
+      const metadataRole = parseRoleFromMetadata(data.user.user_metadata?.role);
+      setRole(dbRole ?? metadataRole);
+
+      console.info("Login successful", { userId: data.user.id, email: data.user.email });
+
       // Update last_login in background — don't block the login flow
       supabase
         .from("users")
         .update({ last_login: new Date().toISOString() })
         .eq("user_id", data.user.id)
-        .then();
+        .then(({ error: lastLoginError }) => {
+          if (lastLoginError) {
+            console.error("last_login update failed:", lastLoginError.message);
+          }
+        });
     }
-    return { error: error ? new Error(error.message) : null };
+
+    return { error: null };
   };
 
   const signOut = async () => {
