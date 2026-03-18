@@ -116,46 +116,6 @@ const LawyerDashboard: React.FC = () => {
     return () => { supabase.removeChannel(caseChannel); };
   }, [profile?.lawyer_id, fetchData]);
 
-  const loadMessages = useCallback(async (caseId: string) => {
-    setLoadingMessages(true);
-    const { data } = await supabase
-      .from("messages")
-      .select("message_id, message_text, sender_id, recipient_id, sent_at, is_read")
-      .eq("case_id", caseId)
-      .order("sent_at", { ascending: true });
-    setMessages((data || []) as Message[]);
-    setLoadingMessages(false);
-
-    if (data && user) {
-      const unread = data.filter(m => m.recipient_id === user.id && !m.is_read);
-      if (unread.length > 0) {
-        await supabase
-          .from("messages")
-          .update({ is_read: true, read_at: new Date().toISOString() })
-          .in("message_id", unread.map(m => m.message_id));
-      }
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (selectedCaseId) loadMessages(selectedCaseId);
-  }, [selectedCaseId, loadMessages]);
-
-  // Realtime: messages for the selected case
-  useEffect(() => {
-    if (!selectedCaseId) return;
-
-    const msgChannel = supabase
-      .channel(`case-messages-${selectedCaseId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages", filter: `case_id=eq.${selectedCaseId}` },
-        () => { loadMessages(selectedCaseId); }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(msgChannel); };
-  }, [selectedCaseId, loadMessages]);
 
   const handleDecline = async (caseId: string) => {
     if (!profile) return;
