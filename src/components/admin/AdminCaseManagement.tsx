@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Gavel, Search, Loader2 } from "lucide-react";
+import { Gavel, Search, Loader2, Eye } from "lucide-react";
 import { Constants } from "@/integrations/supabase/types";
 import AdminCaseAssignDialog from "./AdminCaseAssignDialog";
 import RoutingLogDialog from "./RoutingLogDialog";
