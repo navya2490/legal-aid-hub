@@ -46,6 +46,7 @@ const statusVariant: Record<string, string> = {
 };
 
 const AdminCaseManagement: React.FC<Props> = ({ cases, loading, adminId, onRefresh }) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [urgencyFilter, setUrgencyFilter] = useState("all");
