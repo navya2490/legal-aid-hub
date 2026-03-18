@@ -83,6 +83,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/dashboard/admin/case/:caseId"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AdminCaseDetail />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
