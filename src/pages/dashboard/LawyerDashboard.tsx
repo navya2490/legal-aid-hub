@@ -449,73 +449,20 @@ const LawyerDashboard: React.FC = () => {
               </Card>
 
               {/* Messages Panel */}
-              <Card className="flex flex-col" style={{ minHeight: "360px" }}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    {selectedCase ? `Chat — ${selectedCase.case_reference_number}` : "Select a case to chat"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
-                  {!selectedCaseId ? (
-                    <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-                      <p>Click a case to view messages</p>
-                    </div>
-                  ) : loadingMessages ? (
-                    <div className="flex-1 flex items-center justify-center">
-                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex-1 overflow-y-auto space-y-2 mb-3 max-h-[240px] pr-1">
-                        {messages.length === 0 ? (
-                          <p className="text-xs text-muted-foreground text-center py-4">No messages yet.</p>
-                        ) : (
-                          messages.map(m => {
-                            const isMe = m.sender_id === user?.id;
-                            return (
-                              <div key={m.message_id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                                <div className={`max-w-[80%] rounded-lg px-3 py-2 text-xs ${
-                                  isMe
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-muted text-foreground"
-                                }`}>
-                                  <p>{m.message_text}</p>
-                                  <p className={`text-[10px] mt-1 ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                                    {new Date(m.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <Textarea
-                          value={newMessage}
-                          onChange={e => setNewMessage(e.target.value)}
-                          placeholder="Type a message..."
-                          className="text-xs min-h-[36px] h-9 resize-none"
-                          onKeyDown={e => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSendMessage();
-                            }
-                          }}
-                        />
-                        <Button
-                          size="icon"
-                          className="shrink-0 h-9 w-9"
-                          onClick={handleSendMessage}
-                          disabled={sendingMessage || !newMessage.trim()}
-                        >
-                          {sendingMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
+              {selectedCaseId && selectedCase ? (
+                <CaseMessageThread
+                  caseId={selectedCaseId}
+                  recipientId={selectedCase.user_id}
+                  recipientName={selectedCase.client_name || "Client"}
+                  caseStatus={selectedCase.status}
+                />
+              ) : (
+                <Card style={{ minHeight: "200px" }}>
+                  <CardContent className="flex items-center justify-center h-full py-16 text-muted-foreground text-sm">
+                    <p>Click a case to view messages</p>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Case Details */}
               {selectedCase && (
