@@ -55,6 +55,14 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        "portal-blue": {
+          DEFAULT: "hsl(var(--portal-blue))",
+          foreground: "hsl(var(--portal-blue-foreground))",
+        },
+        "portal-green": {
+          DEFAULT: "hsl(var(--portal-green))",
+          foreground: "hsl(var(--portal-green-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
