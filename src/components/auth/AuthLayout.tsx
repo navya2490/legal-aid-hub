@@ -1,5 +1,6 @@
 import React from "react";
 import { Scale } from "lucide-react";
+import DarkModeToggle from "@/components/DarkModeToggle";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -42,7 +43,10 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
       </div>
 
       {/* Right panel - form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12 bg-background">
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12 bg-background relative">
+        <div className="absolute top-4 right-4">
+          <DarkModeToggle />
+        </div>
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <Scale className="h-6 w-6 text-primary" />

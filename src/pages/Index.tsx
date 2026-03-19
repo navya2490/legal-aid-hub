@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Scale, ArrowRight, Shield, Clock, Users } from "lucide-react";
+import DarkModeToggle from "@/components/DarkModeToggle";
 
 const Index = () => {
   return (
@@ -13,6 +14,7 @@ const Index = () => {
             <span className="text-xl font-bold text-foreground tracking-tight">LegalConnect</span>
           </div>
           <div className="flex items-center gap-3">
+            <DarkModeToggle />
             <Link to="/login">
               <Button variant="ghost" size="sm">Sign In</Button>
             </Link>

@@ -2,12 +2,16 @@ import { useNavigate, Link } from "react-router-dom";
 import { Briefcase, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import DarkModeToggle from "@/components/DarkModeToggle";
 
 const PortalSelection = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 relative">
+      <div className="absolute top-4 right-4">
+        <DarkModeToggle />
+      </div>
       <div className="w-full max-w-3xl space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-[28px] font-bold text-foreground">
