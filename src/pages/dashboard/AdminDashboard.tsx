@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Scale, Shield, LogOut, RefreshCw, Briefcase, Users, BarChart3, AlertTriangle } from "lucide-react";
+import DarkModeToggle from "@/components/DarkModeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdminCaseManagement from "@/components/admin/AdminCaseManagement";
