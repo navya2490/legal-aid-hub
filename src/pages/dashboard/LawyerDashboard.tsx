@@ -12,6 +12,7 @@ import {
   CheckCircle2, Clock, AlertTriangle, Shield
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import DarkModeToggle from "@/components/DarkModeToggle";
 import { lawyerDeclineCase } from "@/lib/caseRouting";
 import { toast } from "sonner";
 import CaseMessageThread from "@/components/messaging/CaseMessageThread";
