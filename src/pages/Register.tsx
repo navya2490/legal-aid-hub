@@ -63,7 +63,7 @@ const Register: React.FC = () => {
       toast.error(error.message);
     } else {
       toast.success("Account created successfully! Welcome to LegalConnect.");
-      navigate(isLawyer ? "/lawyer-dashboard" : "/client-dashboard");
+      navigate(isLawyer ? "/dashboard/lawyer" : "/dashboard/client");
     }
   };
 
