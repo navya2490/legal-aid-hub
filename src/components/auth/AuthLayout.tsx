@@ -1,5 +1,6 @@
 import React from "react";
 import { Scale } from "lucide-react";
+import DarkModeToggle from "@/components/DarkModeToggle";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
