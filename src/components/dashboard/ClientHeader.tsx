@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Scale, LogOut, User, Bell } from "lucide-react";
+import DarkModeToggle from "@/components/DarkModeToggle";
 
 const ClientHeader: React.FC = () => {
   const { user, signOut } = useAuth();
