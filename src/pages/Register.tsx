@@ -62,8 +62,8 @@ const Register: React.FC = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Registration successful! Please check your email to verify your account.");
-      navigate("/login");
+      toast.success("Account created successfully! Welcome to LegalConnect.");
+      navigate(isLawyer ? "/lawyer-dashboard" : "/client-dashboard");
     }
   };
 
