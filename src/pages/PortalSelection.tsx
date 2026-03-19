@@ -2,6 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Briefcase, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import DarkModeToggle from "@/components/DarkModeToggle";
 
 const PortalSelection = () => {
   const navigate = useNavigate();
