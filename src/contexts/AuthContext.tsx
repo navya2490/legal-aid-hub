@@ -131,7 +131,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await hydrateAuthState(initialSession);
     });
 
-    return () => subscription.unsubscribe();
+    // Safety timeout: never stay in loading state forever
+    const safetyTimeout = setTimeout(() => {
+      setLoading((prev) => {
+        if (prev) {
+          console.warn("Auth loading safety timeout triggered");
+        }
+        return false;
+      });
+    }, 10000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(safetyTimeout);
+    };
   }, [hydrateAuthState, auth]);
 
   const signUp = async (email: string, password: string, fullName: string, role: "client" | "lawyer") => {
