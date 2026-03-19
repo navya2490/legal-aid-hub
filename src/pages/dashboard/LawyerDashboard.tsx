@@ -204,6 +204,7 @@ const LawyerDashboard: React.FC = () => {
             <span className="text-lg font-bold text-foreground">LegalConnect</span>
           </div>
           <div className="flex items-center gap-4">
+            <DarkModeToggle />
             <div className="flex items-center gap-2 rounded-full bg-accent px-3 py-1">
               <Briefcase className="h-3 w-3 text-accent-foreground" />
               <span className="text-xs font-medium text-accent-foreground">Lawyer</span>

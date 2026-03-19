@@ -71,6 +71,7 @@ const AdminDashboard: React.FC = () => {
             <span className="text-lg font-bold text-foreground">LegalConnect</span>
           </div>
           <div className="flex items-center gap-3">
+            <DarkModeToggle />
             <div className="flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-0.5">
               <Shield className="h-3 w-3 text-destructive" />
               <span className="text-xs font-medium text-destructive">Admin</span>

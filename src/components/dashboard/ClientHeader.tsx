@@ -15,6 +15,7 @@ const ClientHeader: React.FC = () => {
           <span className="text-lg font-bold text-foreground tracking-tight">LegalConnect</span>
         </div>
         <div className="flex items-center gap-3">
+          <DarkModeToggle />
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-4 w-4" />
           </Button>
