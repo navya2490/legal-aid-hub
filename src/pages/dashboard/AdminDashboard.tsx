@@ -13,6 +13,7 @@ import AdminReviewQueue from "@/components/admin/AdminReviewQueue";
 import AdminAuditLogs from "@/components/admin/AdminAuditLogs";
 import AdminSystemSettings from "@/components/admin/AdminSystemSettings";
 import AdminReports from "@/components/admin/AdminReports";
+import AdminContactSubmissions from "@/components/admin/AdminContactSubmissions";
 
 interface CaseRow {
   case_id: string;
