@@ -3,7 +3,8 @@ import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { IssueDetailsData, SPECIALIZATIONS } from "@/lib/caseValidation";
+import { IssueDetailsData } from "@/lib/caseValidation";
+import { INDIAN_LEGAL_CATEGORIES } from "@/lib/indiaData";
 
 interface Props {
   form: UseFormReturn<IssueDetailsData>;
@@ -18,17 +19,19 @@ const StepIssueDetails: React.FC<Props> = ({ form }) => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-foreground mb-1">Issue Details</h3>
-        <p className="text-sm text-muted-foreground">Tell us about your legal issue.</p>
+        <p className="text-sm text-muted-foreground">
+          Tell us about your legal issue. Your case will be matched with Bar Council registered advocates.
+        </p>
       </div>
 
       <div className="space-y-2">
-        <Label>Issue Category *</Label>
+        <Label>Legal Category *</Label>
         <Select value={issueCategory || ""} onValueChange={(v) => setValue("issueCategory", v, { shouldValidate: true })}>
           <SelectTrigger className={errors.issueCategory ? "border-destructive" : ""}>
-            <SelectValue placeholder="Select a category" />
+            <SelectValue placeholder="Select a legal category" />
           </SelectTrigger>
-          <SelectContent>
-            {SPECIALIZATIONS.map((s) => (
+          <SelectContent className="max-h-[280px]">
+            {INDIAN_LEGAL_CATEGORIES.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}
           </SelectContent>
@@ -40,7 +43,7 @@ const StepIssueDetails: React.FC<Props> = ({ form }) => {
         <Label htmlFor="issueDescription">Issue Description *</Label>
         <Textarea
           id="issueDescription"
-          placeholder="Describe your legal issue in detail..."
+          placeholder="Describe your legal issue in detail. Include relevant facts, dates, and any applicable Indian laws or acts..."
           rows={8}
           {...register("issueDescription")}
           className={errors.issueDescription ? "border-destructive" : ""}

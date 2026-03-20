@@ -287,7 +287,7 @@ const CaseSubmission: React.FC = () => {
       <main className="container mx-auto px-4 sm:px-6 py-6 max-w-3xl">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-foreground mb-1">Submit a New Case</h1>
-          <p className="text-muted-foreground">Complete the form below to submit your legal case for review.</p>
+          <p className="text-muted-foreground">Complete the form below. Your case will be matched with Bar Council registered advocates.</p>
         </div>
 
         <div className="mb-8">
