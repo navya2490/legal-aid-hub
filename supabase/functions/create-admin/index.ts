@@ -14,13 +14,15 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const authHeader = req.headers.get("Authorization");
+    const apikeyHeader = req.headers.get("apikey");
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Check if this is a service-role call (from curl/admin tools) or a user call
-    const isServiceRole = authHeader?.replace("Bearer ", "") === serviceRoleKey;
+    // Check if this is a service-role call
+    const isServiceRole = authHeader?.replace("Bearer ", "") === serviceRoleKey 
+      || apikeyHeader === serviceRoleKey;
 
     if (!isServiceRole) {
       if (!authHeader) {
