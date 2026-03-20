@@ -477,7 +477,7 @@ const Index = () => {
             ))}
           </div>
           <div className="mt-10 border-t border-border pt-6 text-center space-y-1">
-            <p className="text-xs text-muted-foreground">© 2024 Legal Aid Hub. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">© 2026 Legal Aid Hub. All rights reserved.</p>
             <p className="text-xs text-muted-foreground">Governed by laws of India · Registered under Companies Act, 2013</p>
           </div>
         </div>
