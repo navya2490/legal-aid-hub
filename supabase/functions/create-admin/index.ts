@@ -19,12 +19,19 @@ Deno.serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const { email, password, full_name, employee_id, setup_key } = await req.json();
+    const body = await req.json();
+    const { email, password, full_name, employee_id } = body;
 
-    // Allow initial setup with service role key as setup_key, or verify caller is admin
-    const isSetup = setup_key === serviceRoleKey;
+    // Check if there are any admin users — if none, allow bootstrapping
+    const { count } = await supabaseAdmin
+      .from("user_roles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "admin");
 
-    if (!isSetup) {
+    const isBootstrap = (count ?? 0) === 0;
+
+    if (!isBootstrap) {
+      // Verify caller is an existing admin
       if (!authHeader) {
         return new Response(JSON.stringify({ error: "Missing authorization" }), {
           status: 401,
@@ -64,7 +71,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Validate employee_id format
     if (!/^EMP-\d{5}$/.test(employee_id)) {
       return new Response(JSON.stringify({ error: "Employee ID must follow format EMP-XXXXX" }), {
         status: 400,
@@ -72,7 +78,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create the auth user with admin role in metadata
+    // Create the auth user with admin role
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
