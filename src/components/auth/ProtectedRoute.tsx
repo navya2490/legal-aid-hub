@@ -22,14 +22,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && role && !allowedRoles.includes(role)) {
-    // Redirect to appropriate dashboard
-    const dashboardMap = {
-      client: "/dashboard/client",
-      lawyer: "/dashboard/lawyer",
-      admin: "/dashboard/admin",
-    };
-    return <Navigate to={dashboardMap[role] || "/"} replace />;
+  if (allowedRoles && (!role || !allowedRoles.includes(role))) {
+    if (role) {
+      const dashboardMap: Record<string, string> = {
+        client: "/dashboard/client",
+        lawyer: "/dashboard/lawyer",
+        admin: "/dashboard/admin",
+      };
+      return <Navigate to={dashboardMap[role] || "/"} replace />;
+    }
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;

@@ -48,17 +48,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const fetchRole = useCallback(async (userId: string): Promise<AppRole | null> => {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-
+    const fetchWithTimeout = async (): Promise<AppRole | null> => {
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", userId)
-        .abortSignal(controller.signal);
-
-      clearTimeout(timeout);
+        .eq("user_id", userId);
 
       if (error) {
         console.error("Role fetch failed:", error.message);
@@ -67,6 +61,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const roles = (data ?? []).map((item) => item.role as AppRole);
       return pickRole(roles);
+    };
+
+    try {
+      const result = await Promise.race([
+        fetchWithTimeout(),
+        new Promise<null>((resolve) => setTimeout(() => {
+          console.warn("Role fetch timed out for user:", userId);
+          resolve(null);
+        }, 8000)),
+      ]);
+      return result;
     } catch (err) {
       console.error("Role fetch error:", err);
       return null;
