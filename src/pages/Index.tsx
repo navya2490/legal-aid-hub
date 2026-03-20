@@ -194,8 +194,7 @@ const Index = () => {
               </button>
             ))}
             <div className="flex gap-2 pt-2">
-              <Link to="/login" className="flex-1"><Button variant="outline" className="w-full" size="sm">Sign In</Button></Link>
-              <Link to="/register" className="flex-1"><Button className="w-full" size="sm">Get Started</Button></Link>
+              <Link to="/login" className="flex-1"><Button className="w-full" size="sm">Get Started</Button></Link>
             </div>
           </div>
         )}
