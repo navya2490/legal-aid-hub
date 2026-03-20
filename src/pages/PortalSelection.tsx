@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Briefcase, Scale } from "lucide-react";
+import { Briefcase, Scale, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import DarkModeToggle from "@/components/DarkModeToggle";
 
@@ -17,7 +17,7 @@ const PortalSelection = () => {
           <p className="text-muted-foreground">Select your portal to continue</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto">
+        <div className="grid gap-6 md:grid-cols-3">
           <Card
             className="border-2 border-portal-blue/40 bg-card hover:border-portal-blue hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer"
             onClick={() => navigate("/client-login")}
@@ -41,6 +41,19 @@ const PortalSelection = () => {
               </div>
               <h2 className="text-xl font-bold text-foreground">Advocate Portal</h2>
               <p className="text-sm text-muted-foreground">Professional case management for registered lawyers</p>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="border-2 border-portal-purple/40 bg-card hover:border-portal-purple hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+            onClick={() => navigate("/admin-login")}
+          >
+            <CardContent className="p-8 flex flex-col items-center text-center space-y-4">
+              <div className="h-16 w-16 rounded-full bg-portal-purple/10 flex items-center justify-center">
+                <Shield className="h-8 w-8 text-portal-purple" />
+              </div>
+              <h2 className="text-xl font-bold text-foreground">Admin Portal</h2>
+              <p className="text-sm text-muted-foreground">Platform Management & Analytics</p>
             </CardContent>
           </Card>
         </div>
