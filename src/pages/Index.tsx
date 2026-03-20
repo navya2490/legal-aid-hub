@@ -132,10 +132,26 @@ const Index = () => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const [contactLoading, setContactLoading] = useState(false);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Message sent!", description: "We'll get back to you within 24 hours." });
-    setContactForm({ name: "", email: "", subject: "", message: "" });
+    setContactLoading(true);
+    const { error } = await supabase
+      .from("contact_submissions")
+      .insert({
+        name: contactForm.name.trim(),
+        email: contactForm.email.trim(),
+        subject: contactForm.subject.trim(),
+        message: contactForm.message.trim(),
+      });
+    setContactLoading(false);
+    if (error) {
+      toast({ title: "Error", description: "Failed to send message. Please try again.", variant: "destructive" });
+    } else {
+      toast({ title: "Message sent!", description: "We'll get back to you within 24 hours." });
+      setContactForm({ name: "", email: "", subject: "", message: "" });
+    }
   };
 
   const navLinks = [
