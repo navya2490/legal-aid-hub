@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Scale, Shield, LogOut, RefreshCw, Briefcase, Users, BarChart3, AlertTriangle } from "lucide-react";
-import DarkModeToggle from "@/components/DarkModeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AdminSidebar, { type AdminView } from "@/components/admin/AdminSidebar";
+import AdminTopBar from "@/components/admin/AdminTopBar";
+import AdminDashboardHome from "@/components/admin/AdminDashboardHome";
 import AdminCaseManagement from "@/components/admin/AdminCaseManagement";
 import AdminLawyerManagement from "@/components/admin/AdminLawyerManagement";
+import AdminUsersManagement from "@/components/admin/AdminUsersManagement";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import AdminReviewQueue from "@/components/admin/AdminReviewQueue";
+import AdminAuditLogs from "@/components/admin/AdminAuditLogs";
+import AdminSystemSettings from "@/components/admin/AdminSystemSettings";
+import AdminReports from "@/components/admin/AdminReports";
 
 interface CaseRow {
   case_id: string;
@@ -20,18 +23,24 @@ interface CaseRow {
   submitted_at: string;
   assigned_lawyer_id: string | null;
   decline_count: number;
+  updated_at: string;
+  resolved_at: string | null;
 }
 
 const AdminDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const [cases, setCases] = useState<CaseRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeView, setActiveView] = useState<AdminView>("dashboard");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [userName, setUserName] = useState("Admin");
+  const [employeeId] = useState("EMP-00001");
 
-  const fetchCases = async () => {
+  const fetchCases = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("cases")
-      .select("case_id, case_reference_number, issue_category, urgency_level, status, submitted_at, assigned_lawyer_id, decline_count")
+      .select("case_id, case_reference_number, issue_category, urgency_level, status, submitted_at, assigned_lawyer_id, decline_count, updated_at, resolved_at")
       .order("submitted_at", { ascending: false });
 
     if (error) {
@@ -40,113 +49,90 @@ const AdminDashboard: React.FC = () => {
       setCases((data || []) as CaseRow[]);
     }
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     fetchCases();
 
+    // Fetch admin name
+    if (user?.id) {
+      supabase
+        .from("users")
+        .select("full_name")
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.full_name) setUserName(data.full_name);
+        });
+    }
+
     const channel = supabase
-      .channel('admin-cases-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'cases' },
-        () => fetchCases()
-      )
+      .channel("admin-cases-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "cases" }, () => fetchCases())
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchCases, user?.id]);
 
-  const reviewCount = cases.filter((c) => !c.assigned_lawyer_id || c.decline_count >= 3).length;
+  const renderView = () => {
+    switch (activeView) {
+      case "dashboard":
+        return (
+          <AdminDashboardHome
+            userName={userName}
+            employeeId={employeeId}
+            cases={cases}
+            onNavigate={setActiveView}
+          />
+        );
+      case "cases":
+        return (
+          <AdminCaseManagement
+            cases={cases}
+            loading={loading}
+            adminId={user?.id || ""}
+            onRefresh={fetchCases}
+          />
+        );
+      case "users":
+        return <AdminUsersManagement />;
+      case "advocates":
+        return <AdminLawyerManagement />;
+      case "audit":
+        return <AdminAuditLogs />;
+      case "settings":
+        return <AdminSystemSettings />;
+      case "analytics":
+        return <AdminAnalytics cases={cases} />;
+      case "reports":
+        return <AdminReports />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-30">
-        <div className="container mx-auto flex items-center justify-between px-4 sm:px-6 py-3">
-          <div className="flex items-center gap-2">
-            <Scale className="h-5 w-5 text-primary" />
-            <span className="text-lg font-bold text-foreground">LegalConnect</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <DarkModeToggle />
-            <div className="flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-0.5">
-              <Shield className="h-3 w-3 text-destructive" />
-              <span className="text-xs font-medium text-destructive">Admin</span>
-            </div>
-            <span className="text-sm text-muted-foreground hidden sm:inline">{user?.email}</span>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex">
+      <AdminSidebar
+        activeView={activeView}
+        onViewChange={setActiveView}
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed((p) => !p)}
+      />
 
-      <main className="container mx-auto px-4 sm:px-6 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Manage cases, lawyers, and monitor performance.</p>
-          </div>
-          <Button variant="outline" size="sm" onClick={fetchCases} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
-          </Button>
-        </div>
+      <div className="flex-1 flex flex-col min-w-0">
+        <AdminTopBar
+          activeView={activeView}
+          userName={userName}
+          userEmail={user?.email || ""}
+          employeeId={employeeId}
+          onSignOut={signOut}
+        />
 
-        <Tabs defaultValue="cases" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-lg">
-            <TabsTrigger value="cases" className="gap-1.5 text-xs sm:text-sm">
-              <Briefcase className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Cases</span>
-            </TabsTrigger>
-            <TabsTrigger value="review" className="gap-1.5 text-xs sm:text-sm relative">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Review</span>
-              {reviewCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
-                  {reviewCount}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="lawyers" className="gap-1.5 text-xs sm:text-sm">
-              <Users className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Lawyers</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-1.5 text-xs sm:text-sm">
-              <BarChart3 className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Analytics</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="cases">
-            <AdminCaseManagement
-              cases={cases}
-              loading={loading}
-              adminId={user?.id || ""}
-              onRefresh={fetchCases}
-            />
-          </TabsContent>
-
-          <TabsContent value="review">
-            <AdminReviewQueue
-              cases={cases}
-              loading={loading}
-              adminId={user?.id || ""}
-              onRefresh={fetchCases}
-            />
-          </TabsContent>
-
-          <TabsContent value="lawyers">
-            <AdminLawyerManagement />
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <AdminAnalytics cases={cases} />
-          </TabsContent>
-        </Tabs>
-      </main>
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+          {renderView()}
+        </main>
+      </div>
     </div>
   );
 };
