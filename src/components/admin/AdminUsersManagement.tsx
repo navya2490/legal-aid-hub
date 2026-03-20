@@ -5,10 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Loader2, UserPlus, MoreHorizontal } from "lucide-react";
+import { Search, Loader2, MoreHorizontal, ShieldCheck, UserX, UserPlus } from "lucide-react";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 interface UserRow {
@@ -29,24 +33,34 @@ const AdminUsersManagement: React.FC = () => {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("client");
 
-  useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      const { data: roles } = await supabase.from("user_roles").select("user_id, role");
-      const { data: usersData } = await supabase
-        .from("users")
-        .select("user_id, full_name, email, phone, city, state, is_active, created_at");
+  // Add Employee dialog
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({ full_name: "", email: "", password: "", employee_id: "" });
+  const [addingEmployee, setAddingEmployee] = useState(false);
 
-      if (usersData && roles) {
-        const roleMap = new Map<string, string>();
-        roles.forEach((r) => roleMap.set(r.user_id, r.role));
-        setUsers(
-          usersData.map((u) => ({ ...u, role: roleMap.get(u.user_id) || "client" }))
-        );
-      }
-      setLoading(false);
-    };
-    fetch();
+  // Make Admin confirmation
+  const [makeAdminUser, setMakeAdminUser] = useState<UserRow | null>(null);
+  const [promotingAdmin, setPromotingAdmin] = useState(false);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    const { data: roles } = await supabase.from("user_roles").select("user_id, role");
+    const { data: usersData } = await supabase
+      .from("users")
+      .select("user_id, full_name, email, phone, city, state, is_active, created_at");
+
+    if (usersData && roles) {
+      const roleMap = new Map<string, string>();
+      roles.forEach((r) => roleMap.set(r.user_id, r.role));
+      setUsers(
+        usersData.map((u) => ({ ...u, role: roleMap.get(u.user_id) || "client" }))
+      );
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
   const filtered = users.filter((u) => {
@@ -72,10 +86,76 @@ const AdminUsersManagement: React.FC = () => {
     }
   };
 
+  const handleMakeAdmin = async () => {
+    if (!makeAdminUser) return;
+    setPromotingAdmin(true);
+
+    // Update user_roles: insert admin role
+    const { error } = await supabase
+      .from("user_roles")
+      .upsert({ user_id: makeAdminUser.user_id, role: "admin" as const }, { onConflict: "user_id,role" });
+
+    if (error) {
+      toast.error("Failed to promote user to admin");
+    } else {
+      toast.success(`${makeAdminUser.full_name} has been promoted to Admin`);
+      setMakeAdminUser(null);
+      fetchUsers();
+    }
+    setPromotingAdmin(false);
+  };
+
+  const handleAddEmployee = async () => {
+    if (!newEmployee.email || !newEmployee.password || !newEmployee.full_name || !newEmployee.employee_id) {
+      toast.error("All fields are required");
+      return;
+    }
+    if (!/^EMP-\d{5}$/.test(newEmployee.employee_id)) {
+      toast.error("Employee ID must follow format EMP-XXXXX (e.g. EMP-00002)");
+      return;
+    }
+
+    setAddingEmployee(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-admin", {
+        body: {
+          email: newEmployee.email,
+          password: newEmployee.password,
+          full_name: newEmployee.full_name,
+          employee_id: newEmployee.employee_id,
+        },
+      });
+
+      if (error) {
+        toast.error(error.message || "Failed to create employee");
+      } else if (data?.error) {
+        toast.error(data.error);
+      } else {
+        toast.success(`Admin employee ${newEmployee.email} created successfully`);
+        setAddDialogOpen(false);
+        setNewEmployee({ full_name: "", email: "", password: "", employee_id: "" });
+        fetchUsers();
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create employee");
+    }
+    setAddingEmployee(false);
+  };
+
+  const generateEmployeeId = () => {
+    const adminCount = users.filter((u) => u.role === "admin").length;
+    const nextId = `EMP-${String(adminCount + 1).padStart(5, "0")}`;
+    setNewEmployee((prev) => ({ ...prev, employee_id: nextId }));
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Users Management</h2>
+        <Button size="sm" onClick={() => { setAddDialogOpen(true); generateEmployeeId(); }}>
+          <UserPlus className="h-4 w-4 mr-1.5" />
+          Add Employee
+        </Button>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
@@ -138,8 +218,19 @@ const AdminUsersManagement: React.FC = () => {
                         <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => toggleActive(u.user_id, u.is_active)}>
-                          {u.is_active ? "Deactivate" : "Activate"}
+                        {u.role !== "admin" && (
+                          <DropdownMenuItem onClick={() => setMakeAdminUser(u)}>
+                            <ShieldCheck className="h-4 w-4 mr-2" />
+                            Make Admin
+                          </DropdownMenuItem>
+                        )}
+                        {u.role !== "admin" && <DropdownMenuSeparator />}
+                        <DropdownMenuItem
+                          onClick={() => toggleActive(u.user_id, u.is_active)}
+                          className={u.is_active ? "text-destructive focus:text-destructive" : ""}
+                        >
+                          <UserX className="h-4 w-4 mr-2" />
+                          {u.is_active ? "Deactivate Account" : "Activate Account"}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -151,6 +242,61 @@ const AdminUsersManagement: React.FC = () => {
         </Table>
       </div>
       <p className="text-xs text-muted-foreground">Showing {filtered.length} {tab}s</p>
+
+      {/* Add Employee Dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Employee (Admin)</DialogTitle>
+            <DialogDescription>Create a new admin account with an Employee ID. Share credentials securely with the new employee.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label>Full Name</Label>
+              <Input value={newEmployee.full_name} onChange={(e) => setNewEmployee((p) => ({ ...p, full_name: e.target.value }))} placeholder="Enter full name" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Email</Label>
+              <Input type="email" value={newEmployee.email} onChange={(e) => setNewEmployee((p) => ({ ...p, email: e.target.value }))} placeholder="employee@example.com" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Password</Label>
+              <Input type="password" value={newEmployee.password} onChange={(e) => setNewEmployee((p) => ({ ...p, password: e.target.value }))} placeholder="Minimum 8 characters" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Employee ID</Label>
+              <Input value={newEmployee.employee_id} onChange={(e) => setNewEmployee((p) => ({ ...p, employee_id: e.target.value }))} placeholder="EMP-00002" />
+              <p className="text-xs text-muted-foreground">Format: EMP-XXXXX</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddEmployee} disabled={addingEmployee}>
+              {addingEmployee && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+              Create Employee
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Make Admin Confirmation Dialog */}
+      <Dialog open={!!makeAdminUser} onOpenChange={(open) => !open && setMakeAdminUser(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Promote to Admin</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to give <strong>{makeAdminUser?.full_name}</strong> ({makeAdminUser?.email}) admin privileges? This grants full system access.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMakeAdminUser(null)}>Cancel</Button>
+            <Button onClick={handleMakeAdmin} disabled={promotingAdmin} variant="destructive">
+              {promotingAdmin && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+              Confirm Promotion
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
