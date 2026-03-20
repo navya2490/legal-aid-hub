@@ -322,9 +322,9 @@ const Index = () => {
           <div className="text-center mb-14">
             <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">Portals</p>
             <h2 className="text-3xl font-bold md:text-4xl">Choose Your Portal</h2>
-            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Three dedicated portals designed for every stakeholder in the legal process.</p>
+            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Dedicated portals designed for every stakeholder in the legal process.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto">
             <Card className="border border-border bg-card hover:shadow-lg transition-shadow">
               <CardContent className="p-8 text-center space-y-4">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
@@ -346,18 +346,6 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">For Bar Council registered lawyers. Manage cases, communicate with clients, and grow your practice.</p>
                 <Link to="/lawyer-login">
                   <Button variant="outline" className="w-full mt-2">Access Advocate Portal</Button>
-                </Link>
-              </CardContent>
-            </Card>
-            <Card className="border border-border bg-card hover:shadow-lg transition-shadow">
-              <CardContent className="p-8 text-center space-y-4">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                  <Building2 className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold text-card-foreground">Admin Portal</h3>
-                <p className="text-sm text-muted-foreground">For platform administrators. Requires Employee ID. Manage cases, advocates, and platform operations.</p>
-                <Link to="/admin-login">
-                  <Button variant="outline" className="w-full mt-2">Access Admin Portal</Button>
                 </Link>
               </CardContent>
             </Card>
