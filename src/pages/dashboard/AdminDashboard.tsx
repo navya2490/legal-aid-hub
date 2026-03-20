@@ -13,6 +13,7 @@ import AdminReviewQueue from "@/components/admin/AdminReviewQueue";
 import AdminAuditLogs from "@/components/admin/AdminAuditLogs";
 import AdminSystemSettings from "@/components/admin/AdminSystemSettings";
 import AdminReports from "@/components/admin/AdminReports";
+import AdminContactSubmissions from "@/components/admin/AdminContactSubmissions";
 
 interface CaseRow {
   case_id: string;
@@ -106,6 +107,8 @@ const AdminDashboard: React.FC = () => {
         return <AdminAnalytics cases={cases} />;
       case "reports":
         return <AdminReports />;
+      case "contacts":
+        return <AdminContactSubmissions />;
       default:
         return null;
     }

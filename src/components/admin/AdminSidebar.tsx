@@ -1,7 +1,7 @@
 import React from "react";
 import { 
   LayoutDashboard, FolderOpen, Users, Scale, ClipboardList, 
-  Settings, BarChart3, FileText, LogOut, ChevronLeft, ChevronRight, Shield
+  Settings, BarChart3, FileText, LogOut, ChevronLeft, ChevronRight, Shield, Inbox
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 export type AdminView = 
   | "dashboard" | "cases" | "users" | "advocates" 
-  | "audit" | "settings" | "analytics" | "reports";
+  | "audit" | "settings" | "analytics" | "reports" | "contacts";
 
 const NAV_ITEMS: { id: AdminView; label: string; icon: React.ElementType }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -20,6 +20,7 @@ const NAV_ITEMS: { id: AdminView; label: string; icon: React.ElementType }[] = [
   { id: "settings", label: "System Settings", icon: Settings },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "reports", label: "Reports", icon: FileText },
+  { id: "contacts", label: "Contact Submissions", icon: Inbox },
 ];
 
 interface Props {

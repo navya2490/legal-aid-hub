@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -132,10 +133,26 @@ const Index = () => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const [contactLoading, setContactLoading] = useState(false);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Message sent!", description: "We'll get back to you within 24 hours." });
-    setContactForm({ name: "", email: "", subject: "", message: "" });
+    setContactLoading(true);
+    const { error } = await supabase
+      .from("contact_submissions")
+      .insert({
+        name: contactForm.name.trim(),
+        email: contactForm.email.trim(),
+        subject: contactForm.subject.trim(),
+        message: contactForm.message.trim(),
+      });
+    setContactLoading(false);
+    if (error) {
+      toast({ title: "Error", description: "Failed to send message. Please try again.", variant: "destructive" });
+    } else {
+      toast({ title: "Message sent!", description: "We'll get back to you within 24 hours." });
+      setContactForm({ name: "", email: "", subject: "", message: "" });
+    }
   };
 
   const navLinks = [
@@ -436,7 +453,7 @@ const Index = () => {
                 <Label htmlFor="message">Message</Label>
                 <Textarea id="message" required rows={4} value={contactForm.message} onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })} placeholder="Tell us more..." />
               </div>
-              <Button type="submit" className="w-full">Send Message</Button>
+              <Button type="submit" className="w-full" disabled={contactLoading}>{contactLoading ? "Sending..." : "Send Message"}</Button>
             </form>
           </CardContent>
         </Card>
