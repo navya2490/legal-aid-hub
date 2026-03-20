@@ -63,6 +63,10 @@ export default {
           DEFAULT: "hsl(var(--portal-green))",
           foreground: "hsl(var(--portal-green-foreground))",
         },
+        "portal-purple": {
+          DEFAULT: "hsl(var(--portal-purple))",
+          foreground: "hsl(var(--portal-purple-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
