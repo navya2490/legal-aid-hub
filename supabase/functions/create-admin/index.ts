@@ -14,17 +14,17 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const authHeader = req.headers.get("Authorization");
-    const apikeyHeader = req.headers.get("apikey");
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Check if this is a service-role call
-    const isServiceRole = authHeader?.replace("Bearer ", "") === serviceRoleKey 
-      || apikeyHeader === serviceRoleKey;
+    const { email, password, full_name, employee_id, setup_key } = await req.json();
 
-    if (!isServiceRole) {
+    // Allow initial setup with service role key as setup_key, or verify caller is admin
+    const isSetup = setup_key === serviceRoleKey;
+
+    if (!isSetup) {
       if (!authHeader) {
         return new Response(JSON.stringify({ error: "Missing authorization" }), {
           status: 401,
