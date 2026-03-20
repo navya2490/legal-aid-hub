@@ -453,7 +453,7 @@ const Index = () => {
                 <Label htmlFor="message">Message</Label>
                 <Textarea id="message" required rows={4} value={contactForm.message} onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })} placeholder="Tell us more..." />
               </div>
-              <Button type="submit" className="w-full">Send Message</Button>
+              <Button type="submit" className="w-full" disabled={contactLoading}>{contactLoading ? "Sending..." : "Send Message"}</Button>
             </form>
           </CardContent>
         </Card>
