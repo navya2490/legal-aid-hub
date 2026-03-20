@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,52 +31,68 @@ import {
   Linkedin,
   Facebook,
   Star,
-  Clock,
   Award,
-  TrendingUp,
   Play,
+  MapPin,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { useToast } from "@/hooks/use-toast";
 
 const features = [
-  { icon: Scale, title: "Smart Lawyer Matching", desc: "Our AI-powered algorithm matches you with lawyers specializing in your exact legal issue within minutes." },
-  { icon: DollarSign, title: "Transparent Pricing", desc: "Know costs upfront. No hidden fees. Pay only for the services you need." },
-  { icon: Shield, title: "Secure Document Sharing", desc: "Bank-level encryption protects your sensitive legal documents and personal information." },
-  { icon: Activity, title: "Real-Time Case Tracking", desc: "Monitor your case progress 24/7 with instant notifications and status updates." },
-  { icon: Users, title: "Expert Consultation", desc: "Access to 500+ verified lawyers across 12 legal specializations." },
-  { icon: Globe, title: "Multi-Language Support", desc: "Get legal help in your preferred language with multilingual attorney network." },
+  { icon: Scale, title: "Smart Lawyer Matching", desc: "Our AI-powered algorithm matches you with advocates specializing in your exact legal issue — across all Indian courts and tribunals." },
+  { icon: DollarSign, title: "Transparent Pricing", desc: "Know costs upfront in ₹. No hidden fees. Pay only for the services you need with UPI, cards, or net banking." },
+  { icon: Shield, title: "Secure Document Sharing", desc: "Bank-level encryption protects your sensitive legal documents and Aadhaar/PAN information." },
+  { icon: Activity, title: "Real-Time Case Tracking", desc: "Monitor your case progress 24/7 with instant notifications and status updates across District, High Court, and Supreme Court matters." },
+  { icon: Users, title: "Expert Consultation", desc: "Access to 500+ verified advocates across 12 legal specializations, registered with the Bar Council of India." },
+  { icon: Globe, title: "Multi-Language Support", desc: "Get legal help in Hindi, English, Tamil, Telugu, Bengali, Marathi, and more regional languages." },
 ];
 
 const steps = [
   { icon: FileText, step: "01", title: "Submit Your Case", desc: "Fill out our simple form describing your legal issue. Takes less than 5 minutes. Upload relevant documents securely." },
-  { icon: Zap, step: "02", title: "Get Matched", desc: "Our intelligent system analyzes your case and matches you with the most qualified lawyer based on expertise, availability, and urgency." },
-  { icon: CheckCircle, step: "03", title: "Resolve Your Case", desc: "Communicate directly with your lawyer, track progress in real-time, and get your legal matters resolved efficiently." },
+  { icon: Zap, step: "02", title: "Get Matched", desc: "Our intelligent system analyzes your case and matches you with the most qualified advocate based on expertise, jurisdiction, availability, and urgency." },
+  { icon: CheckCircle, step: "03", title: "Resolve Your Case", desc: "Communicate directly with your advocate, track progress in real-time, and get your legal matters resolved efficiently." },
 ];
 
 const differentiators = [
-  { title: "Instant Matching vs. Days of Searching", desc: "Traditional platforms make you wait days for responses. We match you with a lawyer in minutes using smart algorithms." },
-  { title: "Transparent Costs vs. Hidden Fees", desc: "No surprise bills. See lawyer rates upfront. Pay only for time spent on your case." },
-  { title: "Specialized Expertise vs. General Practice", desc: "Get matched with lawyers who specialize in your exact issue — from family law to intellectual property." },
+  { title: "Instant Matching vs. Days of Searching", desc: "Traditional methods make you wait days for referrals. We match you with a qualified advocate in minutes using smart algorithms." },
+  { title: "Transparent Costs vs. Hidden Fees", desc: "No surprise bills. See advocate fees upfront in ₹. Pay only for time spent on your case." },
+  { title: "Specialized Expertise vs. General Practice", desc: "Get matched with advocates who specialize in your exact issue — from family law to cyber crime and consumer protection." },
   { title: "24/7 Access vs. Office Hours", desc: "Submit cases, upload documents, and communicate anytime. Your legal help doesn't keep office hours." },
-  { title: "End-to-End Platform vs. Fragmented Tools", desc: "Everything in one place: case submission, document sharing, messaging, payments, and tracking." },
+  { title: "Pan-India Coverage vs. Local Only", desc: "Access advocates across all Indian states and union territories. District courts to Supreme Court — we've got you covered." },
 ];
 
 const stats = [
   { icon: Award, value: "1,000+", label: "Cases Resolved" },
-  { icon: Users, value: "500+", label: "Verified Lawyers" },
+  { icon: Users, value: "500+", label: "Verified Advocates" },
   { icon: Scale, value: "12", label: "Legal Specializations" },
   { icon: Star, value: "95%", label: "Client Satisfaction" },
 ];
 
 const faqs = [
-  { q: "How does lawyer matching work?", a: "Our platform uses a smart matching algorithm that considers your legal issue category, urgency level, and location to pair you with the most qualified and available lawyer from our verified network. The process typically takes under 5 minutes." },
-  { q: "How much does it cost?", a: "We believe in transparent pricing. There are no platform fees to submit a case. Lawyer rates are displayed upfront before you confirm any engagement, so you always know what you're paying." },
-  { q: "Is my information secure?", a: "Absolutely. We use bank-level AES-256 encryption for all data at rest and TLS 1.3 for data in transit. Your documents and personal information are never shared without your explicit consent." },
-  { q: "What types of cases do you handle?", a: "We cover 12 legal specializations: Family Law, Criminal Law, Civil Litigation, Employment Law, Real Estate Law, Business & Corporate Law, Immigration Law, Intellectual Property, Tax Law, Estate Planning, Personal Injury, and Consumer Protection." },
-  { q: "How long does it take to get matched?", a: "Most clients are matched with a qualified lawyer within minutes of submitting their case. For highly specialized or urgent matters, our team ensures priority matching." },
+  { q: "How does advocate matching work?", a: "Our platform uses a smart matching algorithm that considers your legal issue category, urgency level, jurisdiction, and preferred language to pair you with the most qualified and available advocate from our BCI-verified network." },
+  { q: "How much does it cost?", a: "We believe in transparent pricing. There are no platform fees to submit a case. Advocate fees are displayed upfront in ₹ before you confirm any engagement. We accept UPI, credit/debit cards, and net banking." },
+  { q: "Is my information secure?", a: "Absolutely. We use bank-level AES-256 encryption for all data. Your documents, Aadhaar, PAN, and personal information are never shared without your explicit consent, in compliance with India's IT Act and Digital Personal Data Protection Act." },
+  { q: "What types of cases do you handle?", a: "We cover 12 legal specializations: Family Law, Criminal Law, Civil Litigation, Employment Law, Real Estate Law, Business & Corporate Law, Immigration Law, Intellectual Property, Tax Law (GST/Income Tax), Estate Planning, Personal Injury, and Consumer Protection." },
+  { q: "How long does it take to get matched?", a: "Most clients are matched with a qualified advocate within minutes of submitting their case. For highly specialized or urgent matters (bail applications, stay orders), our team ensures priority matching." },
+  { q: "Is this service available across India?", a: "Yes! Legal Aid Hub serves clients across all 28 states and 8 union territories. Our advocates are registered with the Bar Council of India and various State Bar Councils." },
 ];
+
+const GeoBlockedPage = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="text-center max-w-md space-y-4">
+      <MapPin className="h-16 w-16 text-muted-foreground mx-auto" />
+      <h1 className="text-2xl font-bold text-foreground">Service Unavailable in Your Region</h1>
+      <p className="text-muted-foreground">
+        Legal Aid Hub is currently available only to users in India. We're working on expanding to other regions in the future.
+      </p>
+      <p className="text-sm text-muted-foreground">
+        If you believe this is an error, please contact us at{" "}
+        <a href="mailto:support@legalaidhub.in" className="text-primary underline">support@legalaidhub.in</a>
+      </p>
+    </div>
+  </div>
+);
 
 const Index = () => {
   const { user, role } = useAuth();
@@ -84,6 +100,21 @@ const Index = () => {
   const { toast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [geoStatus, setGeoStatus] = useState<"loading" | "allowed" | "blocked">("loading");
+
+  useEffect(() => {
+    const checkGeo = async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        setGeoStatus(data.country_code === "IN" ? "allowed" : "blocked");
+      } catch {
+        // If geo check fails, allow access (fail-open)
+        setGeoStatus("allowed");
+      }
+    };
+    checkGeo();
+  }, []);
 
   useEffect(() => {
     if (user && role) {
@@ -114,6 +145,18 @@ const Index = () => {
     { label: "Contact", id: "contact" },
   ];
 
+  if (geoStatus === "loading") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (geoStatus === "blocked") {
+    return <GeoBlockedPage />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* NAVBAR */}
@@ -122,6 +165,9 @@ const Index = () => {
           <div className="flex items-center gap-2">
             <Scale className="h-6 w-6 text-primary" />
             <span className="text-lg font-bold">Legal Aid Hub</span>
+            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground border border-border rounded px-1.5 py-0.5 ml-1">
+              🇮🇳 India
+            </span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((l) => (
@@ -165,14 +211,14 @@ const Index = () => {
           <div className="mx-auto max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground">
               <Star className="h-3.5 w-3.5 text-warning" />
-              Trusted by 1,000+ clients nationwide
+              Trusted by 1,000+ clients across India
             </div>
             <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
               Access Legal Help When You{" "}
               <span className="text-primary">Need It Most</span>
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Connect with qualified lawyers instantly. Submit your case online, get matched with expert attorneys, and track everything in one secure platform.
+              Connect with qualified advocates instantly. Submit your case online, get matched with expert lawyers registered with the Bar Council of India, and track everything in one secure platform.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
               <Link to="/login">
@@ -186,8 +232,8 @@ const Index = () => {
             </div>
             <div className="flex flex-wrap justify-center gap-6 pt-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> 1,000+ Cases Resolved</div>
-              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> 500+ Verified Lawyers</div>
-              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> 24/7 Support</div>
+              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> 500+ BCI-Verified Advocates</div>
+              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Pan-India Coverage</div>
             </div>
           </div>
         </div>
@@ -267,13 +313,13 @@ const Index = () => {
             <h2 className="text-3xl font-bold md:text-4xl">Our Mission</h2>
             <div className="space-y-4 text-muted-foreground text-left md:text-center leading-relaxed">
               <p>
-                Legal Aid Hub was founded in 2024 with a simple belief: everyone deserves access to quality legal help, regardless of their location or budget. Traditional legal services are often expensive, slow, and intimidating. We're changing that.
+                Legal Aid Hub was founded in 2024 with a simple belief: every Indian citizen deserves access to quality legal help, regardless of their location or budget. Traditional legal services in India are often expensive, slow, and intimidating. We're changing that.
               </p>
               <p>
-                Our platform connects individuals and small businesses with qualified lawyers instantly, using technology to make legal help affordable and accessible. We've helped over 1,000 clients resolve cases ranging from contract reviews to family law matters.
+                Our platform connects individuals and small businesses across India with qualified advocates instantly, using technology to make legal help affordable and accessible. We've helped over 1,000 clients resolve cases ranging from property disputes and consumer complaints to family law matters and GST issues.
               </p>
               <p>
-                Built by a team of legal professionals and technologists, Legal Aid Hub combines deep legal expertise with modern technology to deliver a better experience for both clients and lawyers.
+                Built by a team of legal professionals and technologists based in India, Legal Aid Hub combines deep expertise in Indian law with modern technology to deliver a better experience for both clients and advocates. All our advocates are registered with the Bar Council of India.
               </p>
             </div>
           </div>
@@ -325,8 +371,8 @@ const Index = () => {
         </div>
         <div className="grid gap-6 sm:grid-cols-3 mb-12">
           {[
-            { icon: Mail, title: "Email", info: "support@legalaidhub.com", sub: "We respond within 24 hours" },
-            { icon: Phone, title: "Phone", info: "+1 (555) 123-4567", sub: "Mon-Fri 9AM-6PM EST" },
+            { icon: Mail, title: "Email", info: "support@legalaidhub.in", sub: "We respond within 24 hours" },
+            { icon: Phone, title: "Phone", info: "+91 11 4567 8900", sub: "Mon-Sat 9AM-7PM IST" },
             { icon: MessageCircle, title: "Live Chat", info: "Chat with our team", sub: "Avg response: 2 minutes" },
           ].map((c) => (
             <Card key={c.title} className="border border-border bg-card text-center">
@@ -377,7 +423,7 @@ const Index = () => {
                 <Scale className="h-5 w-5 text-primary" />
                 <span className="font-bold">Legal Aid Hub</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">Making legal help accessible, affordable, and efficient for everyone.</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Making legal help accessible, affordable, and efficient for every Indian citizen.</p>
               <div className="flex gap-3">
                 <Button variant="ghost" size="icon" className="h-8 w-8"><Twitter className="h-4 w-4" /></Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8"><Linkedin className="h-4 w-4" /></Button>
@@ -385,7 +431,7 @@ const Index = () => {
               </div>
             </div>
             {[
-              { title: "Product", links: ["Features", "Pricing", "For Lawyers", "For Clients"] },
+              { title: "Product", links: ["Features", "Pricing", "For Advocates", "For Clients"] },
               { title: "Company", links: ["About Us", "Careers", "Blog", "Press"] },
               { title: "Legal", links: ["Terms of Service", "Privacy Policy", "Cookie Policy"] },
               { title: "Support", links: ["Help Center", "Contact Us", "Status"] },
@@ -401,7 +447,7 @@ const Index = () => {
             ))}
           </div>
           <div className="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-            © 2024 Legal Aid Hub. All rights reserved.
+            © 2024 Legal Aid Hub. All rights reserved. Registered in India.
           </div>
         </div>
       </footer>
