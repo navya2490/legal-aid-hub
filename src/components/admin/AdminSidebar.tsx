@@ -1,7 +1,7 @@
 import React from "react";
 import { 
   LayoutDashboard, FolderOpen, Users, Scale, ClipboardList, 
-  Settings, BarChart3, FileText, LogOut, ChevronLeft, ChevronRight, Shield
+  Settings, BarChart3, FileText, LogOut, ChevronLeft, ChevronRight, Shield, Inbox
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
