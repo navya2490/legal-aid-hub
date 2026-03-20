@@ -15,7 +15,6 @@ import {
 import {
   Scale,
   ArrowRight,
-  Shield,
   Users,
   FileText,
   Activity,
@@ -36,13 +35,13 @@ import {
   MapPin,
   Gavel,
   Languages,
-  Building2,
   UserCheck,
   BadgeCheck,
   IndianRupee,
   Map,
   BookOpen,
   MonitorSmartphone,
+  Shield,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import DarkModeToggle from "@/components/DarkModeToggle";
@@ -177,9 +176,6 @@ const Index = () => {
           </nav>
           <div className="flex items-center gap-2">
             <DarkModeToggle />
-            <Link to="/admin-login" className="hidden md:inline-flex">
-              <Button variant="ghost" size="sm">Admin Portal</Button>
-            </Link>
             <Link to="/login" className="hidden md:inline-flex">
               <Button variant="outline" size="sm">Sign In</Button>
             </Link>
@@ -199,7 +195,6 @@ const Index = () => {
               </button>
             ))}
             <div className="flex flex-col gap-2 pt-2">
-              <Link to="/admin-login"><Button variant="ghost" className="w-full" size="sm">Admin Portal</Button></Link>
               <Link to="/login"><Button variant="outline" className="w-full" size="sm">Sign In</Button></Link>
               <Link to="/login"><Button className="w-full" size="sm">Get Started</Button></Link>
             </div>
@@ -227,11 +222,6 @@ const Index = () => {
               <Link to="/login">
                 <Button size="lg" className="gap-2 w-full sm:w-auto text-base px-8">
                   Get Started <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link to="/admin-login">
-                <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto text-base px-8">
-                  <Building2 className="h-4 w-4" /> Admin Portal
                 </Button>
               </Link>
               <Button size="lg" variant="ghost" className="gap-2 w-full sm:w-auto text-base px-8" onClick={() => setDemoOpen(true)}>
@@ -331,9 +321,9 @@ const Index = () => {
           <div className="text-center mb-14">
             <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">Portals</p>
             <h2 className="text-3xl font-bold md:text-4xl">Choose Your Portal</h2>
-            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Three dedicated portals designed for every stakeholder in the legal process.</p>
+            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Dedicated portals designed for every stakeholder in the legal process.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto">
             <Card className="border border-border bg-card hover:shadow-lg transition-shadow">
               <CardContent className="p-8 text-center space-y-4">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
@@ -355,18 +345,6 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">For Bar Council registered lawyers. Manage cases, communicate with clients, and grow your practice.</p>
                 <Link to="/lawyer-login">
                   <Button variant="outline" className="w-full mt-2">Access Advocate Portal</Button>
-                </Link>
-              </CardContent>
-            </Card>
-            <Card className="border border-border bg-card hover:shadow-lg transition-shadow">
-              <CardContent className="p-8 text-center space-y-4">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                  <Building2 className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold text-card-foreground">Admin Portal</h3>
-                <p className="text-sm text-muted-foreground">For platform administrators. Requires Employee ID. Manage cases, advocates, and platform operations.</p>
-                <Link to="/admin-login">
-                  <Button variant="outline" className="w-full mt-2">Access Admin Portal</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -498,7 +476,7 @@ const Index = () => {
             ))}
           </div>
           <div className="mt-10 border-t border-border pt-6 text-center space-y-1">
-            <p className="text-xs text-muted-foreground">© 2024 Legal Aid Hub. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">© 2026 Legal Aid Hub. All rights reserved.</p>
             <p className="text-xs text-muted-foreground">Governed by laws of India · Registered under Companies Act, 2013</p>
           </div>
         </div>
