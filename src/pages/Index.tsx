@@ -177,9 +177,6 @@ const Index = () => {
           </nav>
           <div className="flex items-center gap-2">
             <DarkModeToggle />
-            <Link to="/admin-login" className="hidden md:inline-flex">
-              <Button variant="ghost" size="sm">Admin Portal</Button>
-            </Link>
             <Link to="/login" className="hidden md:inline-flex">
               <Button variant="outline" size="sm">Sign In</Button>
             </Link>
@@ -199,7 +196,6 @@ const Index = () => {
               </button>
             ))}
             <div className="flex flex-col gap-2 pt-2">
-              <Link to="/admin-login"><Button variant="ghost" className="w-full" size="sm">Admin Portal</Button></Link>
               <Link to="/login"><Button variant="outline" className="w-full" size="sm">Sign In</Button></Link>
               <Link to="/login"><Button className="w-full" size="sm">Get Started</Button></Link>
             </div>
