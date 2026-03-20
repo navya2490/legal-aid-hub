@@ -22,6 +22,7 @@ import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import AdminCaseDetail from "./pages/dashboard/AdminCaseDetail";
 import ClientCaseDetail from "./pages/dashboard/ClientCaseDetail";
 import AdminLogin from "./pages/AdminLogin";
+import OrganizationSetup from "./pages/OrganizationSetup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
