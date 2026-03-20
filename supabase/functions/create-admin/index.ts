@@ -1,0 +1,118 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const authHeader = req.headers.get("Authorization");
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    const body = await req.json();
+    const { email, password, full_name, employee_id } = body;
+
+    // Check if there are any admin users — if none, allow bootstrapping
+    const { count } = await supabaseAdmin
+      .from("user_roles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "admin");
+
+    const isBootstrap = (count ?? 0) === 0;
+
+    if (!isBootstrap) {
+      // Verify caller is an existing admin
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Missing authorization" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const callerToken = authHeader.replace("Bearer ", "");
+      const { data: callerData } = await supabaseAdmin.auth.getUser(callerToken);
+
+      if (!callerData?.user) {
+        return new Response(JSON.stringify({ error: "Invalid token" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: callerRole } = await supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", callerData.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!callerRole) {
+        return new Response(JSON.stringify({ error: "Only admins can create admin accounts" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    if (!email || !password || !full_name || !employee_id) {
+      return new Response(JSON.stringify({ error: "Missing required fields: email, password, full_name, employee_id" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!/^EMP-\d{5}$/.test(employee_id)) {
+      return new Response(JSON.stringify({ error: "Employee ID must follow format EMP-XXXXX" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Create the auth user with admin role
+    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        full_name,
+        role: "admin",
+        employee_id,
+      },
+    });
+
+    if (createError) {
+      return new Response(JSON.stringify({ error: createError.message }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: `Admin account created for ${email}`,
+        user_id: newUser.user.id,
+        employee_id,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
