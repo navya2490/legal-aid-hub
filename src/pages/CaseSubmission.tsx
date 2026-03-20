@@ -76,7 +76,7 @@ const CaseSubmission: React.FC = () => {
   const personalInfoForm = useForm<PersonalInfoData>({
     resolver: zodResolver(personalInfoSchema),
     mode: "onChange",
-    defaultValues: { phoneCountryCode: "+1" },
+    defaultValues: { phoneCountryCode: "+91", country: "India" },
   });
 
   const issueDetailsForm = useForm<IssueDetailsData>({
