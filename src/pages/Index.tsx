@@ -225,11 +225,6 @@ const Index = () => {
                   Get Started <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link to="/admin-login">
-                <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto text-base px-8">
-                  <Building2 className="h-4 w-4" /> Admin Portal
-                </Button>
-              </Link>
               <Button size="lg" variant="ghost" className="gap-2 w-full sm:w-auto text-base px-8" onClick={() => setDemoOpen(true)}>
                 <Play className="h-4 w-4" /> Watch Demo
               </Button>
