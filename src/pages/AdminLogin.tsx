@@ -136,7 +136,7 @@ const AdminLogin = () => {
             <div className="mt-6 space-y-3 text-center">
               <p className="text-xs text-muted-foreground">
                 Admin accounts are provisioned by the organization.{" "}
-                <button className="text-portal-purple hover:underline font-medium" onClick={() => toast({ title: "IT Support", description: "Please contact your IT administrator for access issues at it-support@legalaidhub.in" })}>
+                <button className="text-portal-purple hover:underline font-medium" onClick={() => toast({ title: "IT Support", description: "Please contact your IT administrator for access issues at inguva2490@gmail.com" })}>
                   Contact IT Support
                 </button>
               </p>
