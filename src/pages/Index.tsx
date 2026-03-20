@@ -179,9 +179,6 @@ const Index = () => {
           <div className="flex items-center gap-2">
             <DarkModeToggle />
             <Link to="/login" className="hidden md:inline-flex">
-              <Button variant="ghost" size="sm">Sign In</Button>
-            </Link>
-            <Link to="/register" className="hidden md:inline-flex">
               <Button size="sm">Get Started</Button>
             </Link>
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -197,8 +194,7 @@ const Index = () => {
               </button>
             ))}
             <div className="flex gap-2 pt-2">
-              <Link to="/login" className="flex-1"><Button variant="outline" className="w-full" size="sm">Sign In</Button></Link>
-              <Link to="/register" className="flex-1"><Button className="w-full" size="sm">Get Started</Button></Link>
+              <Link to="/login" className="flex-1"><Button className="w-full" size="sm">Get Started</Button></Link>
             </div>
           </div>
         )}
