@@ -18,6 +18,7 @@ const VIEW_LABELS: Record<AdminView, string> = {
   settings: "System Settings",
   analytics: "Analytics",
   reports: "Reports",
+  contacts: "Contact Submissions",
 };
 
 interface Props {

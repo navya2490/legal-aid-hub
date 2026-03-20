@@ -107,6 +107,8 @@ const AdminDashboard: React.FC = () => {
         return <AdminAnalytics cases={cases} />;
       case "reports":
         return <AdminReports />;
+      case "contacts":
+        return <AdminContactSubmissions />;
       default:
         return null;
     }
