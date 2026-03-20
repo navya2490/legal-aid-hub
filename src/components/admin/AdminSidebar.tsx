@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 export type AdminView = 
   | "dashboard" | "cases" | "users" | "advocates" 
-  | "audit" | "settings" | "analytics" | "reports";
+  | "audit" | "settings" | "analytics" | "reports" | "contacts";
 
 const NAV_ITEMS: { id: AdminView; label: string; icon: React.ElementType }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
