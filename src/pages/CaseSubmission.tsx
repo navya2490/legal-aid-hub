@@ -76,7 +76,7 @@ const CaseSubmission: React.FC = () => {
   const personalInfoForm = useForm<PersonalInfoData>({
     resolver: zodResolver(personalInfoSchema),
     mode: "onChange",
-    defaultValues: { phoneCountryCode: "+1" },
+    defaultValues: { phoneCountryCode: "+91", country: "India" },
   });
 
   const issueDetailsForm = useForm<IssueDetailsData>({
@@ -104,7 +104,7 @@ const CaseSubmission: React.FC = () => {
           nationalId: data.national_id || "",
           email: data.email || user.email || "",
           phone: data.phone || "",
-          phoneCountryCode: "+1",
+          phoneCountryCode: "+91",
           addressLine1: data.address_line1 || "",
           addressLine2: data.address_line2 || "",
           city: data.city || "",
@@ -287,7 +287,7 @@ const CaseSubmission: React.FC = () => {
       <main className="container mx-auto px-4 sm:px-6 py-6 max-w-3xl">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-foreground mb-1">Submit a New Case</h1>
-          <p className="text-muted-foreground">Complete the form below to submit your legal case for review.</p>
+          <p className="text-muted-foreground">Complete the form below. Your case will be matched with Bar Council registered advocates.</p>
         </div>
 
         <div className="mb-8">

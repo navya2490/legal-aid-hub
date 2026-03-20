@@ -2,8 +2,12 @@ import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PersonalInfoData, COUNTRY_CODES, COUNTRIES } from "@/lib/caseValidation";
+import { PersonalInfoData } from "@/lib/caseValidation";
+import IndianStateSelect from "@/components/indian/IndianStateSelect";
+import IndianCitySelect from "@/components/indian/IndianCitySelect";
+import IndianPhoneInput from "@/components/indian/IndianPhoneInput";
+import AadhaarInput from "@/components/indian/AadhaarInput";
+import PANInput from "@/components/indian/PANInput";
 
 interface Props {
   form: UseFormReturn<PersonalInfoData>;
@@ -11,8 +15,11 @@ interface Props {
 
 const StepPersonalInfo: React.FC<Props> = ({ form }) => {
   const { register, formState: { errors }, setValue, watch } = form;
-  const phoneCountryCode = watch("phoneCountryCode") || "+1";
-  const country = watch("country");
+  const state = watch("state") || "";
+  const city = watch("city") || "";
+  const phone = watch("phone") || "";
+  const aadhaar = watch("aadhaar") || "";
+  const pan = watch("pan") || "";
 
   return (
     <div className="space-y-6">
@@ -24,41 +31,49 @@ const StepPersonalInfo: React.FC<Props> = ({ form }) => {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2 sm:col-span-2">
           <Label htmlFor="fullName">Full Name *</Label>
-          <Input id="fullName" placeholder="John Doe" {...register("fullName")} className={errors.fullName ? "border-destructive" : ""} />
+          <Input id="fullName" placeholder="Rajesh Kumar" {...register("fullName")} className={errors.fullName ? "border-destructive" : ""} />
           {errors.fullName && <p className="text-xs text-destructive">{errors.fullName.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="nationalId">National ID / Passport</Label>
-          <Input id="nationalId" placeholder="ID number" {...register("nationalId")} />
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="email">Email *</Label>
-          <Input id="email" type="email" placeholder="john@example.com" {...register("email")} className={errors.email ? "border-destructive" : ""} />
+          <Input id="email" type="email" placeholder="rajesh@example.com" {...register("email")} className={errors.email ? "border-destructive" : ""} />
           {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
         </div>
 
-        <div className="space-y-2 sm:col-span-2">
-          <Label>Phone</Label>
-          <div className="flex gap-2">
-            <Select value={phoneCountryCode} onValueChange={(v) => setValue("phoneCountryCode", v)}>
-              <SelectTrigger className="w-[100px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRY_CODES.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>{c.code} {c.country}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input placeholder="Phone number" {...register("phone")} className="flex-1" />
-          </div>
+        <div className="space-y-2">
+          <Label>Phone (+91)</Label>
+          <IndianPhoneInput
+            value={phone}
+            onChange={(v) => setValue("phone", v, { shouldValidate: true })}
+            error={!!errors.phone}
+          />
+          {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+        </div>
+
+        <div className="space-y-2">
+          <Label>Aadhaar Number <span className="text-muted-foreground text-xs">(Optional)</span></Label>
+          <AadhaarInput
+            value={aadhaar}
+            onChange={(v) => setValue("aadhaar", v, { shouldValidate: true })}
+            error={!!errors.aadhaar}
+          />
+          {errors.aadhaar && <p className="text-xs text-destructive">{errors.aadhaar.message}</p>}
+        </div>
+
+        <div className="space-y-2">
+          <Label>PAN Number <span className="text-muted-foreground text-xs">(Optional)</span></Label>
+          <PANInput
+            value={pan}
+            onChange={(v) => setValue("pan", v, { shouldValidate: true })}
+            error={!!errors.pan}
+          />
+          {errors.pan && <p className="text-xs text-destructive">{errors.pan.message}</p>}
         </div>
       </div>
 
       <div className="border-t border-border pt-4">
-        <h4 className="text-sm font-medium text-foreground mb-3">Address</h4>
+        <h4 className="text-sm font-medium text-foreground mb-3">Address in India</h4>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="addressLine1">Address Line 1</Label>
@@ -66,32 +81,37 @@ const StepPersonalInfo: React.FC<Props> = ({ form }) => {
           </div>
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="addressLine2">Address Line 2</Label>
-            <Input id="addressLine2" placeholder="Apartment, suite, etc." {...register("addressLine2")} />
+            <Input id="addressLine2" placeholder="Apartment, floor, landmark" {...register("addressLine2")} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            <Input id="city" placeholder="City" {...register("city")} />
+            <Label>State / Union Territory</Label>
+            <IndianStateSelect
+              value={state}
+              onValueChange={(v) => {
+                setValue("state", v, { shouldValidate: true });
+                setValue("city", "", { shouldValidate: true }); // Reset city when state changes
+              }}
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="state">State / Province</Label>
-            <Input id="state" placeholder="State" {...register("state")} />
+            <Label>City</Label>
+            <IndianCitySelect
+              state={state}
+              value={city}
+              onValueChange={(v) => setValue("city", v, { shouldValidate: true })}
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="postalCode">Postal Code</Label>
-            <Input id="postalCode" placeholder="Postal code" {...register("postalCode")} />
-          </div>
-          <div className="space-y-2">
-            <Label>Country</Label>
-            <Select value={country || ""} onValueChange={(v) => setValue("country", v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select country" />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="postalCode">PIN Code</Label>
+            <Input
+              id="postalCode"
+              placeholder="110001"
+              inputMode="numeric"
+              maxLength={6}
+              {...register("postalCode")}
+              className={errors.postalCode ? "border-destructive" : ""}
+            />
+            {errors.postalCode && <p className="text-xs text-destructive">{errors.postalCode.message}</p>}
           </div>
         </div>
       </div>

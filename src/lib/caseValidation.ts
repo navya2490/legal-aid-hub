@@ -1,21 +1,36 @@
 import { z } from "zod";
+import { INDIAN_LEGAL_CATEGORIES, INDIAN_STATES, PHONE_CODE } from "@/lib/indiaData";
 
 export const personalInfoSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be under 100 characters"),
   nationalId: z.string().optional(),
+  aadhaar: z.string().optional().refine(
+    (v) => !v || v.replace(/\D/g, "").length === 12,
+    "Aadhaar must be 12 digits"
+  ),
+  pan: z.string().optional().refine(
+    (v) => !v || /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(v),
+    "PAN must be in format XXXXX0000X"
+  ),
   email: z.string().email("Please enter a valid email"),
-  phone: z.string().optional(),
-  phoneCountryCode: z.string().default("+1"),
+  phone: z.string().optional().refine(
+    (v) => !v || v.replace(/\D/g, "").length === 0 || v.replace(/\D/g, "").length === 10,
+    "Phone must be 10 digits"
+  ),
+  phoneCountryCode: z.string().default(PHONE_CODE),
   addressLine1: z.string().optional(),
   addressLine2: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
-  postalCode: z.string().optional(),
-  country: z.string().optional(),
+  postalCode: z.string().optional().refine(
+    (v) => !v || /^\d{6}$/.test(v),
+    "PIN code must be 6 digits"
+  ),
+  country: z.string().default("India"),
 });
 
 export const issueDetailsSchema = z.object({
-  issueCategory: z.string().min(1, "Please select an issue category"),
+  issueCategory: z.string().min(1, "Please select a legal category"),
   issueDescription: z.string().min(50, "Description must be at least 50 characters").max(5000, "Description must be under 5000 characters"),
 });
 
@@ -53,37 +68,18 @@ export interface CaseFormData {
   consent: ConsentData;
 }
 
-export const SPECIALIZATIONS = [
-  "Family Law", "Criminal Law", "Civil Litigation", "Employment Law",
-  "Real Estate Law", "Business & Corporate Law", "Immigration Law",
-  "Intellectual Property", "Tax Law", "Estate Planning",
-  "Personal Injury", "Consumer Protection",
+// Re-export from indiaData for backward compatibility
+export { INDIAN_LEGAL_CATEGORIES as SPECIALIZATIONS } from "@/lib/indiaData";
+
+export const COUNTRY_CODES = [
+  { code: "+91", country: "India" },
 ] as const;
+
+export const COUNTRIES = ["India"] as const;
 
 export const URGENCY_OPTIONS = [
   { value: "Low" as const, label: "Low", description: "No specific deadline" },
   { value: "Medium" as const, label: "Medium", description: "Within 1-2 weeks" },
   { value: "High" as const, label: "High", description: "Within 2-3 days" },
   { value: "Critical" as const, label: "Critical", description: "Within 24 hours" },
-] as const;
-
-export const COUNTRY_CODES = [
-  { code: "+1", country: "US" },
-  { code: "+44", country: "UK" },
-  { code: "+91", country: "IN" },
-  { code: "+61", country: "AU" },
-  { code: "+49", country: "DE" },
-  { code: "+33", country: "FR" },
-  { code: "+81", country: "JP" },
-  { code: "+86", country: "CN" },
-  { code: "+55", country: "BR" },
-  { code: "+234", country: "NG" },
-  { code: "+27", country: "ZA" },
-  { code: "+971", country: "UAE" },
-] as const;
-
-export const COUNTRIES = [
-  "United States", "United Kingdom", "India", "Australia", "Germany",
-  "France", "Japan", "China", "Brazil", "Nigeria", "South Africa",
-  "United Arab Emirates", "Canada", "Mexico", "Italy", "Spain",
 ] as const;

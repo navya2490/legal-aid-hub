@@ -84,11 +84,11 @@ const CaseCard: React.FC<{ caseData: CaseItem }> = ({ caseData }) => {
         <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border">
           <div className="flex items-center gap-1.5">
             <User className="h-3 w-3" />
-            <span>{caseData.assigned_lawyer_name || "Awaiting Assignment"}</span>
+            <span>{caseData.assigned_lawyer_name || "Awaiting Advocate"}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            <span>{format(new Date(caseData.submitted_at), "MMM d, yyyy")}</span>
+            <span>{format(new Date(caseData.submitted_at), "dd MMM yyyy")}</span>
           </div>
         </div>
       </CardContent>
