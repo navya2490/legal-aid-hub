@@ -15,23 +15,31 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const authHeader = req.headers.get("Authorization");
 
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing authorization" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Verify the caller is an admin (skip for initial setup with service role)
-    const callerToken = authHeader.replace("Bearer ", "");
-    const { data: callerData } = await supabaseAdmin.auth.getUser(callerToken);
-    
-    if (callerData?.user) {
-      // Caller is a logged-in user — verify they are admin
+    // Check if this is a service-role call (from curl/admin tools) or a user call
+    const isServiceRole = authHeader?.replace("Bearer ", "") === serviceRoleKey;
+
+    if (!isServiceRole) {
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Missing authorization" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const callerToken = authHeader.replace("Bearer ", "");
+      const { data: callerData } = await supabaseAdmin.auth.getUser(callerToken);
+
+      if (!callerData?.user) {
+        return new Response(JSON.stringify({ error: "Invalid token" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       const { data: callerRole } = await supabaseAdmin
         .from("user_roles")
         .select("role")
