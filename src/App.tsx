@@ -21,6 +21,7 @@ import LawyerDashboard from "./pages/dashboard/LawyerDashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import AdminCaseDetail from "./pages/dashboard/AdminCaseDetail";
 import ClientCaseDetail from "./pages/dashboard/ClientCaseDetail";
+import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
             <Route
               path="/submit-case"
               element={

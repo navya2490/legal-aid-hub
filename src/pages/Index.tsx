@@ -6,18 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Scale,
   ArrowRight,
   Shield,
   Users,
   FileText,
-  DollarSign,
   Activity,
   Globe,
   Zap,
@@ -34,48 +34,49 @@ import {
   Award,
   Play,
   MapPin,
+  Gavel,
+  Languages,
+  Building2,
+  UserCheck,
+  BadgeCheck,
+  IndianRupee,
+  Map,
+  BookOpen,
+  MonitorSmartphone,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { useToast } from "@/hooks/use-toast";
 
 const features = [
-  { icon: Scale, title: "Smart Lawyer Matching", desc: "Our AI-powered algorithm matches you with advocates specializing in your exact legal issue — across all Indian courts and tribunals." },
-  { icon: DollarSign, title: "Transparent Pricing", desc: "Know costs upfront in ₹. No hidden fees. Pay only for the services you need with UPI, cards, or net banking." },
-  { icon: Shield, title: "Secure Document Sharing", desc: "Bank-level encryption protects your sensitive legal documents and Aadhaar/PAN information." },
-  { icon: Activity, title: "Real-Time Case Tracking", desc: "Monitor your case progress 24/7 with instant notifications and status updates across District, High Court, and Supreme Court matters." },
-  { icon: Users, title: "Expert Consultation", desc: "Access to 500+ verified advocates across 12 legal specializations, registered with the Bar Council of India." },
-  { icon: Globe, title: "Multi-Language Support", desc: "Get legal help in Hindi, English, Tamil, Telugu, Bengali, Marathi, and more regional languages." },
+  { icon: Zap, title: "Smart Advocate Matching", desc: "Get matched with lawyers registered with Bar Council of India, specializing in your exact legal matter." },
+  { icon: Map, title: "Pan-India Coverage", desc: "Access legal help across all 28 states and 8 union territories." },
+  { icon: Shield, title: "Secure Document Vault", desc: "Bank-level encryption for Aadhaar, PAN, and sensitive legal documents." },
+  { icon: Activity, title: "Real-Time Case Tracking", desc: "Monitor your case status with instant WhatsApp and SMS notifications." },
+  { icon: BookOpen, title: "Indian Law Expertise", desc: "Specialists in IPC, CPC, CrPC, Indian Constitution, and special laws." },
+  { icon: Languages, title: "Multi-Language Support", desc: "Get help in Hindi, English, and 10+ regional languages." },
 ];
 
 const steps = [
-  { icon: FileText, step: "01", title: "Submit Your Case", desc: "Fill out our simple form describing your legal issue. Takes less than 5 minutes. Upload relevant documents securely." },
-  { icon: Zap, step: "02", title: "Get Matched", desc: "Our intelligent system analyzes your case and matches you with the most qualified advocate based on expertise, jurisdiction, availability, and urgency." },
-  { icon: CheckCircle, step: "03", title: "Resolve Your Case", desc: "Communicate directly with your advocate, track progress in real-time, and get your legal matters resolved efficiently." },
+  { icon: FileText, step: "01", title: "Submit Your Case", desc: "Describe your legal issue. Upload Aadhaar/PAN if needed. Takes 5 minutes." },
+  { icon: UserCheck, step: "02", title: "Get Matched", desc: "Our system matches you with Bar Council registered advocates based on expertise and location." },
+  { icon: CheckCircle, step: "03", title: "Resolve Your Case", desc: "Track your case from filing to judgment with real-time updates." },
 ];
 
 const differentiators = [
-  { title: "Instant Matching vs. Days of Searching", desc: "Traditional methods make you wait days for referrals. We match you with a qualified advocate in minutes using smart algorithms." },
-  { title: "Transparent Costs vs. Hidden Fees", desc: "No surprise bills. See advocate fees upfront in ₹. Pay only for time spent on your case." },
-  { title: "Specialized Expertise vs. General Practice", desc: "Get matched with advocates who specialize in your exact issue — from family law to cyber crime and consumer protection." },
-  { title: "24/7 Access vs. Office Hours", desc: "Submit cases, upload documents, and communicate anytime. Your legal help doesn't keep office hours." },
-  { title: "Pan-India Coverage vs. Local Only", desc: "Access advocates across all Indian states and union territories. District courts to Supreme Court — we've got you covered." },
+  { icon: Globe, title: "All-India Access vs. Local Limitations", desc: "Get expert help whether you're in Mumbai or a tier-3 city." },
+  { icon: IndianRupee, title: "Fixed Fees vs. Unpredictable Costs", desc: "Know costs upfront in INR. No hidden charges." },
+  { icon: Gavel, title: "Specialized in Indian Laws", desc: "Experts in IPC, Family Law, Consumer Protection Act, GST, Labour Laws, Property Laws." },
+  { icon: MonitorSmartphone, title: "Digital-First vs. Court-Running", desc: "Submit cases, upload documents, communicate online. Save trips to lawyer offices." },
+  { icon: BadgeCheck, title: "Verified Advocates Only", desc: "All lawyers verified with Bar Council of India registration." },
 ];
 
 const stats = [
   { icon: Award, value: "1,000+", label: "Cases Resolved" },
   { icon: Users, value: "500+", label: "Verified Advocates" },
-  { icon: Scale, value: "12", label: "Legal Specializations" },
-  { icon: Star, value: "95%", label: "Client Satisfaction" },
-];
-
-const faqs = [
-  { q: "How does advocate matching work?", a: "Our platform uses a smart matching algorithm that considers your legal issue category, urgency level, jurisdiction, and preferred language to pair you with the most qualified and available advocate from our BCI-verified network." },
-  { q: "How much does it cost?", a: "We believe in transparent pricing. There are no platform fees to submit a case. Advocate fees are displayed upfront in ₹ before you confirm any engagement. We accept UPI, credit/debit cards, and net banking." },
-  { q: "Is my information secure?", a: "Absolutely. We use bank-level AES-256 encryption for all data. Your documents, Aadhaar, PAN, and personal information are never shared without your explicit consent, in compliance with India's IT Act and Digital Personal Data Protection Act." },
-  { q: "What types of cases do you handle?", a: "We cover 12 legal specializations: Family Law, Criminal Law, Civil Litigation, Employment Law, Real Estate Law, Business & Corporate Law, Immigration Law, Intellectual Property, Tax Law (GST/Income Tax), Estate Planning, Personal Injury, and Consumer Protection." },
-  { q: "How long does it take to get matched?", a: "Most clients are matched with a qualified advocate within minutes of submitting their case. For highly specialized or urgent matters (bail applications, stay orders), our team ensures priority matching." },
-  { q: "Is this service available across India?", a: "Yes! Legal Aid Hub serves clients across all 28 states and 8 union territories. Our advocates are registered with the Bar Council of India and various State Bar Councils." },
+  { icon: Map, value: "28", label: "States Covered" },
+  { icon: BookOpen, value: "12", label: "Legal Domains" },
+  { icon: Star, value: "95%", label: "Resolution Rate" },
 ];
 
 const GeoBlockedPage = () => (
@@ -99,6 +100,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [geoStatus, setGeoStatus] = useState<"loading" | "allowed" | "blocked">("loading");
 
@@ -109,7 +111,6 @@ const Index = () => {
         const data = await res.json();
         setGeoStatus(data.country_code === "IN" ? "allowed" : "blocked");
       } catch {
-        // If geo check fails, allow access (fail-open)
         setGeoStatus("allowed");
       }
     };
@@ -141,6 +142,7 @@ const Index = () => {
   const navLinks = [
     { label: "Features", id: "features" },
     { label: "How It Works", id: "how-it-works" },
+    { label: "For Advocates", id: "portals" },
     { label: "About", id: "about" },
     { label: "Contact", id: "contact" },
   ];
@@ -165,11 +167,8 @@ const Index = () => {
           <div className="flex items-center gap-2">
             <Scale className="h-6 w-6 text-primary" />
             <span className="text-lg font-bold">Legal Aid Hub</span>
-            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground border border-border rounded px-1.5 py-0.5 ml-1">
-              🇮🇳 India
-            </span>
           </div>
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-6">
             {navLinks.map((l) => (
               <button key={l.id} onClick={() => scrollTo(l.id)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 {l.label}
@@ -178,30 +177,38 @@ const Index = () => {
           </nav>
           <div className="flex items-center gap-2">
             <DarkModeToggle />
+            <Link to="/admin-login" className="hidden md:inline-flex">
+              <Button variant="ghost" size="sm">Admin Portal</Button>
+            </Link>
+            <Link to="/login" className="hidden md:inline-flex">
+              <Button variant="outline" size="sm">Sign In</Button>
+            </Link>
             <Link to="/login" className="hidden md:inline-flex">
               <Button size="sm">Get Started</Button>
             </Link>
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border bg-background px-4 pb-4 space-y-2">
+          <div className="lg:hidden border-t border-border bg-background px-4 pb-4 space-y-2">
             {navLinks.map((l) => (
               <button key={l.id} onClick={() => scrollTo(l.id)} className="block w-full text-left py-2 text-sm text-muted-foreground hover:text-foreground">
                 {l.label}
               </button>
             ))}
-            <div className="flex gap-2 pt-2">
-              <Link to="/login" className="flex-1"><Button className="w-full" size="sm">Get Started</Button></Link>
+            <div className="flex flex-col gap-2 pt-2">
+              <Link to="/admin-login"><Button variant="ghost" className="w-full" size="sm">Admin Portal</Button></Link>
+              <Link to="/login"><Button variant="outline" className="w-full" size="sm">Sign In</Button></Link>
+              <Link to="/login"><Button className="w-full" size="sm">Get Started</Button></Link>
             </div>
           </div>
         )}
       </header>
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-accent/30 to-background">
+      <section className="relative overflow-hidden bg-gradient-to-b from-portal-blue/10 to-background">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--portal-blue)/0.08),transparent_70%)]" />
         <div className="container relative mx-auto px-4 py-20 md:py-32 text-center">
           <div className="mx-auto max-w-3xl space-y-6">
@@ -214,7 +221,7 @@ const Index = () => {
               <span className="text-primary">Need It Most</span>
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Connect with qualified advocates instantly. Submit your case online, get matched with expert lawyers registered with the Bar Council of India, and track everything in one secure platform.
+              Connect with qualified advocates instantly. Submit your case online, get matched with expert lawyers across India, and track everything in one secure platform.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
               <Link to="/login">
@@ -222,14 +229,31 @@ const Index = () => {
                   Get Started <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto text-base px-8" onClick={() => scrollTo("features")}>
+              <Link to="/admin-login">
+                <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto text-base px-8">
+                  <Building2 className="h-4 w-4" /> Admin Portal
+                </Button>
+              </Link>
+              <Button size="lg" variant="ghost" className="gap-2 w-full sm:w-auto text-base px-8" onClick={() => setDemoOpen(true)}>
                 <Play className="h-4 w-4" /> Watch Demo
               </Button>
             </div>
-            <div className="flex flex-wrap justify-center gap-6 pt-8 text-sm text-muted-foreground">
+
+            {/* Hero Illustration - Scale of Justice */}
+            <div className="pt-8 flex justify-center">
+              <div className="relative w-32 h-32 md:w-40 md:h-40">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[hsl(25,100%,50%)] via-[hsl(0,0%,100%)] to-[hsl(120,60%,35%)] opacity-20" />
+                <div className="absolute inset-2 rounded-full bg-background flex items-center justify-center">
+                  <Scale className="h-16 w-16 md:h-20 md:w-20 text-primary" />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 pt-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> 1,000+ Cases Resolved</div>
-              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> 500+ BCI-Verified Advocates</div>
-              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Pan-India Coverage</div>
+              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> 500+ Verified Advocates</div>
+              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> 28 States Covered</div>
+              <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Available in Hindi & English</div>
             </div>
           </div>
         </div>
@@ -239,7 +263,7 @@ const Index = () => {
       <section id="features" className="container mx-auto px-4 py-20">
         <div className="text-center mb-14">
           <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">Features</p>
-          <h2 className="text-3xl font-bold md:text-4xl">Everything You Need for Legal Support</h2>
+          <h2 className="text-3xl font-bold md:text-4xl">Complete Legal Support Across India</h2>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
@@ -280,18 +304,18 @@ const Index = () => {
         </div>
       </section>
 
-      {/* WHY CHOOSE US */}
+      {/* WHAT MAKES US DIFFERENT */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-14">
           <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">Why Us</p>
-          <h2 className="text-3xl font-bold md:text-4xl">Why Choose Legal Aid Hub?</h2>
+          <h2 className="text-3xl font-bold md:text-4xl">What Makes Us Different</h2>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {differentiators.map((d, i) => (
-            <Card key={i} className="border border-border bg-card">
+            <Card key={i} className="border border-border bg-card hover:shadow-lg transition-shadow">
               <CardContent className="p-6 space-y-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-bold">
-                  {i + 1}
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                  <d.icon className="h-5 w-5 text-primary" />
                 </div>
                 <h3 className="font-semibold text-card-foreground">{d.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{d.desc}</p>
@@ -301,60 +325,89 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ABOUT */}
-      <section id="about" className="bg-muted/50">
+      {/* USER ROLES / PORTALS */}
+      <section id="portals" className="bg-muted/50">
         <div className="container mx-auto px-4 py-20">
-          <div className="mx-auto max-w-3xl text-center space-y-6">
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary">About</p>
-            <h2 className="text-3xl font-bold md:text-4xl">Our Mission</h2>
-            <div className="space-y-4 text-muted-foreground text-left md:text-center leading-relaxed">
-              <p>
-                Legal Aid Hub was founded in 2024 with a simple belief: every Indian citizen deserves access to quality legal help, regardless of their location or budget. Traditional legal services in India are often expensive, slow, and intimidating. We're changing that.
-              </p>
-              <p>
-                Our platform connects individuals and small businesses across India with qualified advocates instantly, using technology to make legal help affordable and accessible. We've helped over 1,000 clients resolve cases ranging from property disputes and consumer complaints to family law matters and GST issues.
-              </p>
-              <p>
-                Built by a team of legal professionals and technologists based in India, Legal Aid Hub combines deep expertise in Indian law with modern technology to deliver a better experience for both clients and advocates. All our advocates are registered with the Bar Council of India.
-              </p>
-            </div>
+          <div className="text-center mb-14">
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">Portals</p>
+            <h2 className="text-3xl font-bold md:text-4xl">Choose Your Portal</h2>
+            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Three dedicated portals designed for every stakeholder in the legal process.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Card className="border border-border bg-card hover:shadow-lg transition-shadow">
+              <CardContent className="p-8 text-center space-y-4">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                  <Users className="h-7 w-7 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold text-card-foreground">Client Portal</h3>
+                <p className="text-sm text-muted-foreground">For individuals and businesses seeking legal help. Submit cases, track progress, and communicate with advocates.</p>
+                <Link to="/client-login">
+                  <Button variant="outline" className="w-full mt-2">Access Client Portal</Button>
+                </Link>
+              </CardContent>
+            </Card>
+            <Card className="border border-border bg-card hover:shadow-lg transition-shadow">
+              <CardContent className="p-8 text-center space-y-4">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                  <Gavel className="h-7 w-7 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold text-card-foreground">Advocate Portal</h3>
+                <p className="text-sm text-muted-foreground">For Bar Council registered lawyers. Manage cases, communicate with clients, and grow your practice.</p>
+                <Link to="/lawyer-login">
+                  <Button variant="outline" className="w-full mt-2">Access Advocate Portal</Button>
+                </Link>
+              </CardContent>
+            </Card>
+            <Card className="border border-border bg-card hover:shadow-lg transition-shadow">
+              <CardContent className="p-8 text-center space-y-4">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                  <Building2 className="h-7 w-7 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold text-card-foreground">Admin Portal</h3>
+                <p className="text-sm text-muted-foreground">For platform administrators. Requires Employee ID. Manage cases, advocates, and platform operations.</p>
+                <Link to="/admin-login">
+                  <Button variant="outline" className="w-full mt-2">Access Admin Portal</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="container mx-auto px-4 py-20">
+        <div className="mx-auto max-w-3xl text-center space-y-6">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">About</p>
+          <h2 className="text-3xl font-bold md:text-4xl">Making Justice Accessible Across India</h2>
+          <div className="space-y-4 text-muted-foreground text-left md:text-center leading-relaxed">
+            <p>
+              Legal Aid Hub was founded in 2024 to bridge the justice gap in India. With over 70% of Indians having no access to legal services, we're leveraging technology to make quality legal help available to everyone — from metro cities to rural areas.
+            </p>
+            <p>
+              Our platform connects individuals, small businesses, and organizations with Bar Council verified advocates across all 28 states and 8 union territories. We handle cases under Indian Penal Code (IPC), Civil Procedure Code (CPC), family matters, consumer disputes, GST issues, labour laws, and more.
+            </p>
+            <p>
+              Built by legal professionals and technologists who understand India's unique legal landscape, we're committed to making the Indian justice system more accessible, affordable, and efficient.
+            </p>
           </div>
         </div>
       </section>
 
       {/* STATISTICS */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((s) => (
-            <Card key={s.label} className="border border-border bg-card text-center">
-              <CardContent className="p-8 space-y-3">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                  <s.icon className="h-6 w-6 text-primary" />
-                </div>
-                <p className="text-3xl font-bold text-card-foreground">{s.value}</p>
-                <p className="text-sm text-muted-foreground">{s.label}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* FAQ */}
       <section className="bg-muted/50">
         <div className="container mx-auto px-4 py-20">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">FAQ</p>
-            <h2 className="text-3xl font-bold md:text-4xl">Need Help?</h2>
-          </div>
-          <div className="mx-auto max-w-2xl">
-            <Accordion type="single" collapsible className="space-y-2">
-              {faqs.map((f, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="border border-border rounded-lg bg-card px-4">
-                  <AccordionTrigger className="text-left text-sm font-medium hover:no-underline">{f.q}</AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">{f.a}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            {stats.map((s) => (
+              <Card key={s.label} className="border border-border bg-card text-center">
+                <CardContent className="p-8 space-y-3">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                    <s.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <p className="text-3xl font-bold text-card-foreground">{s.value}</p>
+                  <p className="text-sm text-muted-foreground">{s.label}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -365,11 +418,12 @@ const Index = () => {
           <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">Contact</p>
           <h2 className="text-3xl font-bold md:text-4xl">Get In Touch</h2>
         </div>
-        <div className="grid gap-6 sm:grid-cols-3 mb-12">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
           {[
             { icon: Mail, title: "Email", info: "support@legalaidhub.in", sub: "We respond within 24 hours" },
-            { icon: Phone, title: "Phone", info: "+91 11 4567 8900", sub: "Mon-Sat 9AM-7PM IST" },
-            { icon: MessageCircle, title: "Live Chat", info: "Chat with our team", sub: "Avg response: 2 minutes" },
+            { icon: Phone, title: "Phone", info: "+91 9876543210", sub: "Mon-Sat 9AM-7PM IST" },
+            { icon: MessageCircle, title: "WhatsApp", info: "+91 9876543210", sub: "WhatsApp support available" },
+            { icon: MapPin, title: "Office", info: "Registered Office", sub: "New Delhi, India" },
           ].map((c) => (
             <Card key={c.title} className="border border-border bg-card text-center">
               <CardContent className="p-6 space-y-3">
@@ -420,6 +474,7 @@ const Index = () => {
                 <span className="font-bold">Legal Aid Hub</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">Making legal help accessible, affordable, and efficient for every Indian citizen.</p>
+              <p className="text-xs text-muted-foreground">All advocates verified by Bar Council of India.</p>
               <div className="flex gap-3">
                 <Button variant="ghost" size="icon" className="h-8 w-8"><Twitter className="h-4 w-4" /></Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8"><Linkedin className="h-4 w-4" /></Button>
@@ -429,8 +484,8 @@ const Index = () => {
             {[
               { title: "Product", links: ["Features", "Pricing", "For Advocates", "For Clients"] },
               { title: "Company", links: ["About Us", "Careers", "Blog", "Press"] },
-              { title: "Legal", links: ["Terms of Service", "Privacy Policy", "Cookie Policy"] },
-              { title: "Support", links: ["Help Center", "Contact Us", "Status"] },
+              { title: "Legal", links: ["Terms of Service", "Privacy Policy", "Cookie Policy", "DPDP Compliance"] },
+              { title: "Support", links: ["Help Center", "Contact Us", "WhatsApp Support", "Status"] },
             ].map((col) => (
               <div key={col.title} className="space-y-3">
                 <h4 className="text-sm font-semibold">{col.title}</h4>
@@ -442,11 +497,34 @@ const Index = () => {
               </div>
             ))}
           </div>
-          <div className="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-            © 2024 Legal Aid Hub. All rights reserved. Registered in India.
+          <div className="mt-10 border-t border-border pt-6 text-center space-y-1">
+            <p className="text-xs text-muted-foreground">© 2024 Legal Aid Hub. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground">Governed by laws of India · Registered under Companies Act, 2013</p>
           </div>
         </div>
       </footer>
+
+      {/* Demo Modal */}
+      <Dialog open={demoOpen} onOpenChange={setDemoOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Platform Demo</DialogTitle>
+            <DialogDescription>See how Legal Aid Hub works in under 2 minutes.</DialogDescription>
+          </DialogHeader>
+          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+            <div className="text-center space-y-3">
+              <Play className="h-12 w-12 text-muted-foreground mx-auto" />
+              <p className="text-sm text-muted-foreground">Demo video coming soon</p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setDemoOpen(false)}>Close</Button>
+            <Link to="/login">
+              <Button>Get Started Now</Button>
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
