@@ -20,6 +20,7 @@ const NAV_ITEMS: { id: AdminView; label: string; icon: React.ElementType }[] = [
   { id: "settings", label: "System Settings", icon: Settings },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "reports", label: "Reports", icon: FileText },
+  { id: "contacts", label: "Contact Submissions", icon: Inbox },
 ];
 
 interface Props {
