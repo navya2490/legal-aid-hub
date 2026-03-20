@@ -104,7 +104,7 @@ const CaseSubmission: React.FC = () => {
           nationalId: data.national_id || "",
           email: data.email || user.email || "",
           phone: data.phone || "",
-          phoneCountryCode: "+1",
+          phoneCountryCode: "+91",
           addressLine1: data.address_line1 || "",
           addressLine2: data.address_line2 || "",
           city: data.city || "",
