@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Briefcase, Scale, Shield } from "lucide-react";
+import { Briefcase, Scale } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import DarkModeToggle from "@/components/DarkModeToggle";
 

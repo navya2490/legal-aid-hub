@@ -15,7 +15,6 @@ import {
 import {
   Scale,
   ArrowRight,
-  Shield,
   Users,
   FileText,
   Activity,
@@ -36,13 +35,13 @@ import {
   MapPin,
   Gavel,
   Languages,
-  Building2,
   UserCheck,
   BadgeCheck,
   IndianRupee,
   Map,
   BookOpen,
   MonitorSmartphone,
+  Shield,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import DarkModeToggle from "@/components/DarkModeToggle";
